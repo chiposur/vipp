@@ -1,8 +1,10 @@
+import { FileSystem } from './fileSystem'
 import { TerminalState } from './terminalState'
 
 class Terminal {
   canvas: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
+  fileSystem: FileSystem
   state: TerminalState
 
   public constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
@@ -12,7 +14,8 @@ class Terminal {
   }
 
   private init() {
-    this.state = new TerminalState();
+    this.fileSystem = new FileSystem();
+    this.state = new TerminalState(this.fileSystem);
     this.drawBg();
     this.drawNewPromptRow();
   }
