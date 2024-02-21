@@ -10,6 +10,8 @@ class TerminalState {
   fontSz: string
   fontColor: string
   textBaseline: string
+  textLines: Array<string>
+  textLinePadding: number;
 
   public constructor(fileSystem: FileSystem) {
     this.fileSystem = fileSystem;
@@ -17,6 +19,8 @@ class TerminalState {
     this.fontName = "sans-serif";
     this.fontSz = "16px";
     this.fontColor = "white";
+    this.textLines = [];
+    this.textLinePadding = 8;
     this.setCurrDir(this.fileSystem.root);
   }
 
