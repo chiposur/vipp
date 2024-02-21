@@ -69,7 +69,7 @@ class TerminalCommands {
     return this.cycleCommandDown();
   }
 
-  // cycleCommandUp cycles the command backwards in history
+  // cycleCommandUp returns the next command backwards in history
   // Returns empty string if the history cannot be cycled
   private cycleCommandUp(): string {
     let currIndex = this.currCmdIndex;
@@ -85,7 +85,7 @@ class TerminalCommands {
     return this.commandHistory[this.currCmdIndex];
   }
 
-  // cycleCommandDown cycles the command forwards in history
+  // cycleCommandDown returns the next command forwards in history
   // Returns empty string if the history cannot be cycled
   private cycleCommandDown(): string {
     let currIndex = this.currCmdIndex;
