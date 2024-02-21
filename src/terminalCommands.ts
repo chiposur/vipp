@@ -10,6 +10,8 @@ class TerminalCommands {
   fileSystem: FileSystem
   terminalState: TerminalState
   commandMap: Map<string, TerminalCommand>
+  commandHistory: Array<string>
+  currCmdIndex: number
 
   public constructor(fileSystem: FileSystem, terminalState: TerminalState) {
     this.fileSystem = fileSystem;
@@ -45,14 +47,57 @@ class TerminalCommands {
         name: 'pwd',
         run: (args?: Array<string>): string => { return this.pwd(args || []) }
       });
+    this.commandHistory = [];
+    this.currCmdIndex = -1;
   }
 
   public processCommand(command: string, args?: Array<string>): string {
     if (this.commandMap.has(command)) {
       const terminalCommand: TerminalCommand = this.commandMap.get(command);
+      this.commandHistory.push(`${command} ${args.join(' ')}`)
       return terminalCommand.run(args || []);
     }
     return `${command}: command not found`;
+  }
+
+  // cycleCommand returns a command forwards or backwards in history
+  // Returns empty string if the history cannot be cycled
+  public cycleCommand(isUp: boolean): string {
+    if (isUp) {
+      return this.cycleCommandUp();
+    }
+    return this.cycleCommandDown();
+  }
+
+  // cycleCommandUp cycles the command backwards in history
+  // Returns empty string if the history cannot be cycled
+  private cycleCommandUp(): string {
+    let currIndex = this.currCmdIndex;
+    if (currIndex == -1) {
+      this.currCmdIndex = this.commandHistory.length - 1;
+      return this.commandHistory[this.currCmdIndex];
+    }
+    currIndex -= 1;
+    if (currIndex < 0) {
+      return '';
+    }
+    this.currCmdIndex = currIndex;
+    return this.commandHistory[this.currCmdIndex];
+  }
+
+  // cycleCommandDown cycles the command forwards in history
+  // Returns empty string if the history cannot be cycled
+  private cycleCommandDown(): string {
+    let currIndex = this.currCmdIndex;
+    if (currIndex == -1) {
+      return '';
+    }
+    currIndex += 1;
+    if (currIndex > this.commandHistory.length - 1) {
+      return '';
+    }
+    this.currCmdIndex = currIndex;
+    return this.commandHistory[this.currCmdIndex];
   }
 
   private ls(args: Array<string>): string {
