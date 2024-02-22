@@ -94,7 +94,7 @@ class Terminal {
       this.state.currLinePt.x + this.state.textLinePadding,
       this.state.currLinePt.y + this.state.textLinePadding);
     const textMetrics = this.ctx.measureText(this.state.prompt);
-    this.state.currLinePt.x = textMetrics.width;
+    this.state.currLinePt.x += textMetrics.width;
     this.state.textLines.push(this.state.prompt);
   }
 
