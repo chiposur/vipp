@@ -1,8 +1,7 @@
-import { FileSystem, Folder } from './fileSystem'
+import { Folder } from './fileSystem'
 import { Point } from './types'
 
 class TerminalState {
-  fileSystem: FileSystem
   currDir: Folder
   currLinePt: Point
   prompt: string
@@ -13,15 +12,14 @@ class TerminalState {
   textLines: Array<string>
   textLinePadding: number;
 
-  public constructor(fileSystem: FileSystem) {
-    this.fileSystem = fileSystem;
+  public constructor() {
     this.currLinePt = new Point(0, 0);
     this.fontName = "sans-serif";
     this.fontSz = "16px";
     this.fontColor = "white";
     this.textLines = [];
     this.textLinePadding = 8;
-    this.setCurrDir(this.fileSystem.root);
+    this.prompt = "";
   }
 
   public getFont(): string {
@@ -37,12 +35,12 @@ class TerminalState {
     this.prompt = `[user@vipp-editor ${this.currDir.name}]$ `
   }
 
-  public getPrompt() {
+  public getPrompt(): string {
     return this.prompt;
   }
 
-  public getPwd() {
-    return this.currDir.getFullName();
+  public getPwd(): string {
+    return this.currDir?.getFullName() || "";
   }
 }
 

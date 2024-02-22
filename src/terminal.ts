@@ -24,7 +24,8 @@ class Terminal {
 
   private init() {
     this.fileSystem = new FileSystem();
-    this.state = new TerminalState(this.fileSystem);
+    this.state = new TerminalState();
+    this.state.setCurrDir(this.fileSystem.root);
     this.commands = new TerminalCommands(this.fileSystem, this.state);
     this.registerHandlers();
     this.syncCanvasResolution();
