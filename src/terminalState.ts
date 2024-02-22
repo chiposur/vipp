@@ -6,8 +6,9 @@ class TerminalState {
   currLinePt: Point
   prompt: string
   fontName: string
-  fontSz: string
+  fontSize: string
   fontColor: string
+  bgColor: string
   textBaseline: string
   textLines: Array<string>
   textLinePadding: number;
@@ -15,15 +16,16 @@ class TerminalState {
   public constructor() {
     this.currLinePt = new Point(0, 0);
     this.fontName = "sans-serif";
-    this.fontSz = "16px";
+    this.fontSize = "16px";
     this.fontColor = "white";
+    this.bgColor = "black";
     this.textLines = [];
     this.textLinePadding = 8;
     this.prompt = "";
   }
 
   public getFont(): string {
-    return `${this.fontSz} ${this.fontName}`;
+    return `${this.fontSize} ${this.fontName}`;
   }
 
   public getFontColor(): string {

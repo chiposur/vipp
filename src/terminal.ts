@@ -60,7 +60,7 @@ class Terminal {
   }
 
   private drawBg() {
-    this.ctx.fillStyle = "black";
+    this.ctx.fillStyle = this.state.bgColor;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
