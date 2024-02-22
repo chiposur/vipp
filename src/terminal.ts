@@ -64,13 +64,27 @@ class Terminal {
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
+  private getLineHeight(textLine: string) {
+    const textMetrics = this.ctx.measureText(textLine);
+    return textMetrics.fontBoundingBoxAscent +
+      textMetrics.fontBoundingBoxDescent +
+      this.state.textLinePadding;
+  }
+
+  private moveToNewline() {
+    const lastLine = this.state.textLines[this.state.textLines.length - 1];
+    const textMetrics = this.ctx.measureText(lastLine);
+    const lineWidth = textMetrics.width;
+    const numRows = Math.max(1, Math.ceil(lineWidth / this.canvas.width));
+    this.state.currLinePt.y += numRows * this.getLineHeight(lastLine);
+  }
+
   private drawTextLine(textLine: string) {
     this.ctx.fillText(
       textLine,
       this.state.currLinePt.x + this.state.textLinePadding,
       this.state.currLinePt.y + this.state.textLinePadding);
-    const textMetrics = this.ctx.measureText(textLine);
-    this.state.currLinePt.y = textMetrics.actualBoundingBoxDescent;
+    this.state.currLinePt.y += this.getLineHeight(textLine);
   }
 
   private drawNewPromptRow() {
