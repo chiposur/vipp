@@ -39,7 +39,7 @@ class FileSystem {
   }
 
   private isReservedFoldername(name: string) {
-    return name == "." || name === ".." || name === "~";
+    return name === "." || name === ".." || name === "~";
   }
 
   public resolveFolder(curr: Folder, path: string): FolderResult {
