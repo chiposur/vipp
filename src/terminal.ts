@@ -46,7 +46,7 @@ class Terminal {
   }
 
   private onKeyDown(e: KeyboardEvent) {
-    if (e.ctrlKey && e.key == "k") {
+    if (e.ctrlKey && e.key === "k") {
       this.clearTerminal();
       e.preventDefault();
       return;

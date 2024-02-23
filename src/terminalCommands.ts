@@ -73,7 +73,7 @@ class TerminalCommands {
   // Returns empty string if the history cannot be cycled
   private cycleCommandUp(): string {
     let currIndex = this.currCmdIndex;
-    if (currIndex == -1) {
+    if (currIndex === -1) {
       this.currCmdIndex = this.commandHistory.length - 1;
       return this.commandHistory[this.currCmdIndex];
     }
@@ -89,7 +89,7 @@ class TerminalCommands {
   // Returns empty string if the history cannot be cycled
   private cycleCommandDown(): string {
     let currIndex = this.currCmdIndex;
-    if (currIndex == -1) {
+    if (currIndex === -1) {
       return '';
     }
     currIndex += 1;
