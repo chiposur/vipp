@@ -29,12 +29,24 @@ class Terminal {
     this.commands = new TerminalCommands(this.fileSystem, this.state);
     this.registerHandlers();
     this.syncCanvasResolution();
-    this.drawBg();
     this.drawNewPromptRow();
+    this.render();
   }
 
   private registerHandlers() {
-    // TODO: register input handlers
+    const eventTarget = document.getElementById("canvas-wrapper");
+    eventTarget.addEventListener("keydown", (e: KeyboardEvent) => this.onKeyDown(e));
+  }
+
+  private onKeyDown(e: KeyboardEvent) {
+    switch (e.key) {
+      case "Enter":
+        this.moveToNewline();
+        this.drawNewPromptRow();
+        break;
+      default:
+        return;
+    }
   }
 
   private syncCanvasResolution() {
@@ -54,8 +66,11 @@ class Terminal {
 
   private drawTextLines() {
     this.setFontStyle();
-    this.state.textLines.forEach((line) => {
+    this.state.textLines.forEach((line, index) => {
       this.drawTextLine(line);
+      if (index != this.state.textLines.length - 1) {
+        this.moveToNewline();
+      }
     });
   }
 
@@ -76,6 +91,7 @@ class Terminal {
     const textMetrics = this.ctx.measureText(lastLine);
     const lineWidth = textMetrics.width;
     const numRows = Math.max(1, Math.ceil(lineWidth / this.canvas.width));
+    this.state.currLinePt.x = 0;
     this.state.currLinePt.y += numRows * this.getLineHeight(lastLine);
   }
 
@@ -84,7 +100,6 @@ class Terminal {
       textLine,
       this.state.currLinePt.x + this.state.textLinePadding,
       this.state.currLinePt.y + this.state.textLinePadding);
-    this.state.currLinePt.y += this.getLineHeight(textLine);
   }
 
   private drawNewPromptRow() {
