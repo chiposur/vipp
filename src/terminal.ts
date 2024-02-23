@@ -38,7 +38,19 @@ class Terminal {
     eventTarget.addEventListener("keydown", (e: KeyboardEvent) => this.onKeyDown(e));
   }
 
+  private clearTerminal() {
+    this.state.textLines = [];
+    this.state.currLinePt = new Point(0, 0);
+    this.drawNewPromptRow();
+    this.render();
+  }
+
   private onKeyDown(e: KeyboardEvent) {
+    if (e.ctrlKey && e.key == "k") {
+      this.clearTerminal();
+      e.preventDefault();
+      return;
+    }
     switch (e.key) {
       case "Enter":
         this.moveToNewline();
