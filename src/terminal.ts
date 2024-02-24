@@ -83,7 +83,6 @@ class Terminal {
     const hasCommand = currLine.length > promptLen;
     if (hasCommand) {
       const parsedCommand = currLine.substring(promptLen);
-      this.commands.commandHistory.push(parsedCommand);
       const output = this.commands.processCommand(parsedCommand);
       this.drawText(output);
       this.state.textLines.push(output);
