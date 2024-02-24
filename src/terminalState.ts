@@ -44,6 +44,10 @@ class TerminalState {
   public getPwd(): string {
     return this.currDir?.getFullName() || "";
   }
+
+  public setCurrTextLine(textLine: string) {
+    this.textLines[this.textLines.length - 1] = textLine;
+  }
 }
 
 export { TerminalState };

@@ -11,7 +11,7 @@ class TerminalCommands {
   terminalState: TerminalState
   commandMap: Map<string, TerminalCommand>
   commandHistory: Array<string>
-  currCmdIndex: number
+  cycledCommandIndex: number
 
   public constructor(fileSystem: FileSystem, terminalState: TerminalState) {
     this.fileSystem = fileSystem;
@@ -48,13 +48,15 @@ class TerminalCommands {
         run: (args?: Array<string>): string => { return this.pwd(args || []) }
       });
     this.commandHistory = [];
-    this.currCmdIndex = -1;
+    this.cycledCommandIndex = -1;
   }
 
   public processCommand(command: string, args?: Array<string>): string {
+    this.cycledCommandIndex = -1;
+    const argsText = args ? ` ${args.join(' ')}` : '';
+    this.commandHistory.push(`${command}${argsText}`)
     if (this.commandMap.has(command)) {
       const terminalCommand: TerminalCommand = this.commandMap.get(command);
-      this.commandHistory.push(`${command} ${args?.join(' ')}`)
       return terminalCommand.run(args || []);
     }
     return `${command}: command not found`;
@@ -72,23 +74,23 @@ class TerminalCommands {
   // cycleCommandUp returns the next command backwards in history
   // Returns empty string if the history cannot be cycled
   private cycleCommandUp(): string {
-    let currIndex = this.currCmdIndex;
+    let currIndex = this.cycledCommandIndex;
     if (currIndex === -1) {
-      this.currCmdIndex = this.commandHistory.length - 1;
-      return this.commandHistory[this.currCmdIndex];
+      this.cycledCommandIndex = this.commandHistory.length - 1;
+      return this.commandHistory[this.cycledCommandIndex];
     }
     currIndex -= 1;
     if (currIndex < 0) {
       return '';
     }
-    this.currCmdIndex = currIndex;
-    return this.commandHistory[this.currCmdIndex];
+    this.cycledCommandIndex = currIndex;
+    return this.commandHistory[this.cycledCommandIndex];
   }
 
   // cycleCommandDown returns the next command forwards in history
   // Returns empty string if the history cannot be cycled
   private cycleCommandDown(): string {
-    let currIndex = this.currCmdIndex;
+    let currIndex = this.cycledCommandIndex;
     if (currIndex === -1) {
       return '';
     }
@@ -96,8 +98,8 @@ class TerminalCommands {
     if (currIndex > this.commandHistory.length - 1) {
       return '';
     }
-    this.currCmdIndex = currIndex;
-    return this.commandHistory[this.currCmdIndex];
+    this.cycledCommandIndex = currIndex;
+    return this.commandHistory[this.cycledCommandIndex];
   }
 
   private ls(args: Array<string>): string {

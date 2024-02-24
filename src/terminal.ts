@@ -61,7 +61,7 @@ class Terminal {
       this.drawText(e.key);
       const lastLine = this.state.textLines[this.state.textLines.length - 1];
       const newLastLine = `${lastLine}${e.key}`;
-      this.state.textLines[this.state.textLines.length - 1] = newLastLine;
+      this.state.setCurrTextLine(newLastLine);
     }
   }
 
@@ -70,10 +70,15 @@ class Terminal {
     const promptLen = this.state.prompt.length;
     if (lastLine.length > promptLen) {
       const newLastLine = lastLine.substring(0, lastLine.length - 1);
-      this.state.textLines[this.state.textLines.length - 1] = newLastLine;
+      this.state.setCurrTextLine(newLastLine);
       this.state.currLinePt.x -= 1;
       this.render();
     }
+  }
+
+  private clearCurrentLine() {
+    this.state.setCurrTextLine(this.state.prompt);
+    this.render();
   }
 
   private handleEnter() {
@@ -91,9 +96,24 @@ class Terminal {
     this.drawNewPromptRow();
   }
 
+  private handleCycleHistory(up: boolean) {
+    const cycledCommand = this.commands.cycleCommand(up);
+    console.log(cycledCommand);
+    if (cycledCommand) {
+      this.clearCurrentLine();
+      this.drawText(cycledCommand);
+      this.state.setCurrTextLine(`${this.state.prompt}${cycledCommand}`);
+    }
+  }
+
   private onKeyDown(e: KeyboardEvent) {
     if (e.ctrlKey && e.key === "k") {
       this.clearTerminal();
+      e.preventDefault();
+      return;
+    }
+    if (e.ctrlKey && e.key === "u") {
+      this.clearCurrentLine();
       e.preventDefault();
       return;
     }
@@ -103,6 +123,12 @@ class Terminal {
         break;
       case "Backspace":
         this.handleBackspace();
+        break;
+      case "ArrowUp":
+        this.handleCycleHistory(true);
+        break;
+      case "ArrowDown":
+        this.handleCycleHistory(false);
         break;
       default:
         this.handleKeyPress(e);
