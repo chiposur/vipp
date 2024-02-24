@@ -98,7 +98,6 @@ class Terminal {
 
   private handleCycleHistory(up: boolean) {
     const cycledCommand = this.commands.cycleCommand(up);
-    console.log(cycledCommand);
     if (cycledCommand) {
       this.clearCurrentLine();
       this.drawText(cycledCommand);
