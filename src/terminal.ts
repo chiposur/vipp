@@ -45,6 +45,37 @@ class Terminal {
     this.render();
   }
 
+  private isUTF16(code: string): boolean {
+    if (code.length < 0) {
+      return false;
+    }
+    const charCode = code.charCodeAt(0);
+    if (!charCode) {
+      return false;
+    }
+    return code.charCodeAt(0) <= 65535;
+  }
+
+  private handleKeyPress(e: KeyboardEvent) {
+    if (e.key.length === 1 && this.isUTF16(e.code)) {
+      this.drawText(e.key);
+      const lastLine = this.state.textLines[this.state.textLines.length - 1];
+      const newLastLine = `${lastLine}${e.key}`;
+      this.state.textLines[this.state.textLines.length - 1] = newLastLine;
+    }
+  }
+
+  private handleBackspace() {
+    const lastLine = this.state.textLines[this.state.textLines.length - 1];
+    const promptLen = this.state.prompt.length;
+    if (lastLine.length > promptLen) {
+      const newLastLine = lastLine.substring(0, lastLine.length - 1);
+      this.state.textLines[this.state.textLines.length - 1] = newLastLine;
+      this.state.currLinePt.x -= 1;
+      this.render();
+    }
+  }
+
   private onKeyDown(e: KeyboardEvent) {
     if (e.ctrlKey && e.key === "k") {
       this.clearTerminal();
@@ -56,8 +87,11 @@ class Terminal {
         this.moveToNewline();
         this.drawNewPromptRow();
         break;
+      case "Backspace":
+        this.handleBackspace();
+        break;
       default:
-        return;
+        this.handleKeyPress(e);
     }
   }
 
@@ -79,7 +113,7 @@ class Terminal {
   private drawTextLines() {
     this.setFontStyle();
     this.state.textLines.forEach((line, index) => {
-      this.drawTextLine(line);
+      this.drawText(line);
       if (index != this.state.textLines.length - 1) {
         this.moveToNewline();
       }
@@ -107,11 +141,13 @@ class Terminal {
     this.state.currLinePt.y += numRows * this.getLineHeight(lastLine);
   }
 
-  private drawTextLine(textLine: string) {
+  private drawText(textLine: string) {
     this.ctx.fillText(
       textLine,
       this.state.currLinePt.x + this.state.textLinePadding,
       this.state.currLinePt.y + this.state.textLinePadding);
+    const textMetrics = this.ctx.measureText(textLine);
+    this.state.currLinePt.x += textMetrics.width;
   }
 
   private drawNewPromptRow() {
