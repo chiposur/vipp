@@ -3,7 +3,9 @@ import { Point } from './types'
 
 class TerminalState {
   currDir: Folder
-  currLinePt: Point
+  currLinePos: Point
+  cursorPos: Point
+  cursorIndex: number
   prompt: string
   fontName: string
   fontSize: string
@@ -11,15 +13,20 @@ class TerminalState {
   bgColor: string
   textBaseline: string
   textLines: Array<string>
-  textLinePadding: number;
+  textLinePadding: number
+  currTextLineCmd: string
 
   public constructor() {
-    this.currLinePt = new Point(0, 0);
+    this.currLinePos = new Point(0, 0);
+    this.cursorPos = new Point(0, 0);
+    this.cursorIndex = 0;
+    this.currTextLineCmd = ""
     this.fontName = "sans-serif";
     this.fontSize = "16px";
     this.fontColor = "white";
     this.bgColor = "black";
     this.textLines = [];
+    this.currTextLineCmd = ""
     this.textLinePadding = 8;
     this.prompt = "";
   }
@@ -45,8 +52,13 @@ class TerminalState {
     return this.currDir?.getFullName() || "";
   }
 
-  public setCurrTextLine(textLine: string) {
-    this.textLines[this.textLines.length - 1] = textLine;
+  public setCurrTextLineCmd(cmd: string) {
+    this.textLines[this.textLines.length - 1] = `${this.prompt}${cmd}`;
+    this.currTextLineCmd = cmd;
+  }
+
+  public getCurrTextLineCmd(): string {
+    return this.currTextLineCmd;
   }
 }
 

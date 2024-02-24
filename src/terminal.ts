@@ -40,7 +40,7 @@ class Terminal {
 
   private clearTerminal() {
     this.state.textLines = [];
-    this.state.currLinePt = new Point(0, 0);
+    this.state.currLinePos = new Point(0, 0);
     this.drawNewPromptRow();
     this.render();
   }
@@ -59,36 +59,33 @@ class Terminal {
   private handleKeyPress(e: KeyboardEvent) {
     if (e.key.length === 1 && this.isUTF16(e.code)) {
       this.drawText(e.key);
-      const lastLine = this.state.textLines[this.state.textLines.length - 1];
-      const newLastLine = `${lastLine}${e.key}`;
-      this.state.setCurrTextLine(newLastLine);
+      const currCmd = this.state.getCurrTextLineCmd();
+      const newCmd = `${currCmd}${e.key}`;
+      this.state.setCurrTextLineCmd(newCmd);
     }
   }
 
   private handleBackspace() {
-    const lastLine = this.state.textLines[this.state.textLines.length - 1];
-    const promptLen = this.state.prompt.length;
-    if (lastLine.length > promptLen) {
-      const newLastLine = lastLine.substring(0, lastLine.length - 1);
-      this.state.setCurrTextLine(newLastLine);
-      this.state.currLinePt.x -= 1;
+    const currCmd = this.state.getCurrTextLineCmd();
+    if (currCmd) {
+      const newCmd = currCmd.substring(0, currCmd.length - 2);
+      this.state.setCurrTextLineCmd(newCmd);
+      this.state.currLinePos.x -= 1;
+      this.translateCursor(-1, 0);
       this.render();
     }
   }
 
   private clearCurrentLine() {
-    this.state.setCurrTextLine(this.state.prompt);
+    this.state.setCurrTextLineCmd("");
     this.render();
   }
 
   private handleEnter() {
     this.moveToNewline();
-    const currLine = this.state.textLines[this.state.textLines.length - 1];
-    const promptLen = this.state.prompt.length;
-    const hasCommand = currLine.length > promptLen;
-    if (hasCommand) {
-      const parsedCommand = currLine.substring(promptLen);
-      const output = this.commands.processCommand(parsedCommand);
+    const currLineCmd = this.state.getCurrTextLineCmd();
+    if (currLineCmd) {
+      const output = this.commands.processCommand(currLineCmd);
       this.drawText(output);
       this.state.textLines.push(output);
       this.moveToNewline();
@@ -99,10 +96,16 @@ class Terminal {
   private handleCycleHistory(up: boolean) {
     const cycledCommand = this.commands.cycleCommand(up);
     if (cycledCommand) {
-      this.clearCurrentLine();
-      this.drawText(cycledCommand);
-      this.state.setCurrTextLine(`${this.state.prompt}${cycledCommand}`);
+      this.state.setCurrTextLineCmd(cycledCommand);
+      this.render();
     }
+  }
+
+  private translateCursor(x: number, y: number) {
+    const translatedX = Math.max(Math.min(this.state.cursorPos.x + x, this.canvas.width), 0);
+    const translatedY = Math.max(Math.min(this.state.cursorPos.y + y, this.canvas.height), 0);
+    this.state.cursorPos = new Point(translatedX, translatedY);
+    this.state.cursorIndex = translatedX;
   }
 
   private onKeyDown(e: KeyboardEvent) {
@@ -144,7 +147,7 @@ class Terminal {
   }
 
   private render() {
-    this.state.currLinePt = new Point(0, 0);
+    this.state.currLinePos = new Point(0, 0);
     this.drawBg();
     this.drawTextLines();
   }
@@ -176,28 +179,29 @@ class Terminal {
     const textMetrics = this.ctx.measureText(lastLine);
     const lineWidth = textMetrics.width;
     const numRows = Math.max(1, Math.ceil(lineWidth / this.canvas.width));
-    this.state.currLinePt.x = 0;
-    this.state.currLinePt.y += numRows * this.getLineHeight(lastLine);
+    this.state.currLinePos.x = 0;
+    this.state.currLinePos.y += numRows * this.getLineHeight(lastLine);
   }
 
   private drawText(textLine: string) {
     this.ctx.fillText(
       textLine,
-      this.state.currLinePt.x + this.state.textLinePadding,
-      this.state.currLinePt.y + this.state.textLinePadding);
+      this.state.currLinePos.x + this.state.textLinePadding,
+      this.state.currLinePos.y + this.state.textLinePadding);
     const textMetrics = this.ctx.measureText(textLine);
-    this.state.currLinePt.x += textMetrics.width;
+    this.state.currLinePos.x += textMetrics.width;
   }
 
   private drawNewPromptRow() {
     this.setFontStyle();
     this.ctx.fillText(
       this.state.prompt,
-      this.state.currLinePt.x + this.state.textLinePadding,
-      this.state.currLinePt.y + this.state.textLinePadding);
+      this.state.currLinePos.x + this.state.textLinePadding,
+      this.state.currLinePos.y + this.state.textLinePadding);
     const textMetrics = this.ctx.measureText(this.state.prompt);
-    this.state.currLinePt.x += textMetrics.width;
+    this.state.currLinePos.x += textMetrics.width;
     this.state.textLines.push(this.state.prompt);
+    this.state.setCurrTextLineCmd("");
   }
 
   private setFontStyle() {
