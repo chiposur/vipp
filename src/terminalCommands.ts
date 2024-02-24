@@ -54,7 +54,7 @@ class TerminalCommands {
   public processCommand(command: string, args?: Array<string>): string {
     if (this.commandMap.has(command)) {
       const terminalCommand: TerminalCommand = this.commandMap.get(command);
-      this.commandHistory.push(`${command} ${args.join(' ')}`)
+      this.commandHistory.push(`${command} ${args?.join(' ')}`)
       return terminalCommand.run(args || []);
     }
     return `${command}: command not found`;

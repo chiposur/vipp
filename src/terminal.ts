@@ -76,6 +76,22 @@ class Terminal {
     }
   }
 
+  private handleEnter() {
+    this.moveToNewline();
+    const currLine = this.state.textLines[this.state.textLines.length - 1];
+    const promptLen = this.state.prompt.length;
+    const hasCommand = currLine.length > promptLen;
+    if (hasCommand) {
+      const parsedCommand = currLine.substring(promptLen);
+      this.commands.commandHistory.push(parsedCommand);
+      const output = this.commands.processCommand(parsedCommand);
+      this.drawText(output);
+      this.state.textLines.push(output);
+      this.moveToNewline();
+    }
+    this.drawNewPromptRow();
+  }
+
   private onKeyDown(e: KeyboardEvent) {
     if (e.ctrlKey && e.key === "k") {
       this.clearTerminal();
@@ -84,8 +100,7 @@ class Terminal {
     }
     switch (e.key) {
       case "Enter":
-        this.moveToNewline();
-        this.drawNewPromptRow();
+        this.handleEnter();
         break;
       case "Backspace":
         this.handleBackspace();
