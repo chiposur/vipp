@@ -58,10 +58,10 @@ class Terminal {
 
   private handleKeyPress(e: KeyboardEvent) {
     if (e.key.length === 1 && this.isUTF16(e.code)) {
-      this.drawText(e.key);
       const currCmd = this.state.getCurrTextLineCmd();
       const newCmd = `${currCmd}${e.key}`;
       this.state.setCurrTextLineCmd(newCmd);
+      this.render();
     }
   }
 
@@ -86,11 +86,11 @@ class Terminal {
     const currLineCmd = this.state.getCurrTextLineCmd();
     if (currLineCmd) {
       const output = this.commands.processCommand(currLineCmd);
-      this.drawText(output);
       this.state.textLines.push(output);
       this.moveToNewline();
     }
     this.drawNewPromptRow();
+    this.render();
   }
 
   private handleCycleHistory(up: boolean) {
@@ -160,6 +160,8 @@ class Terminal {
         this.moveToNewline();
       }
     });
+    this.state.setCursorPos(this.state.getCurrLinePos());
+    this.drawCursor();
   }
 
   private drawBg() {
@@ -181,6 +183,20 @@ class Terminal {
     const numRows = Math.max(1, Math.ceil(lineWidth / this.canvas.width));
     this.state.currLinePos.x = 0;
     this.state.currLinePos.y += numRows * this.getLineHeight(lastLine);
+  }
+
+  private drawCursor() {
+    const pos = this.state.cursorPos;
+    pos.x += this.state.cursorPaddingLeft;
+    pos.y += this.state.cursorPaddingTop;
+    this.ctx.fillStyle = this.state.getFontColor();
+    const cursorWidth = 2;
+    const cursorHeight = 20;
+    this.ctx.fillRect(
+      pos.x,
+      pos.y,
+      cursorWidth,
+      cursorHeight);
   }
 
   private drawText(textLine: string) {

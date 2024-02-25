@@ -14,6 +14,8 @@ class TerminalState {
   textBaseline: string
   textLines: Array<string>
   textLinePadding: number
+  cursorPaddingLeft: number
+  cursorPaddingTop: number
   currTextLineCmd: string
 
   public constructor() {
@@ -28,6 +30,8 @@ class TerminalState {
     this.textLines = [];
     this.currTextLineCmd = ""
     this.textLinePadding = 8;
+    this.cursorPaddingLeft = 8;
+    this.cursorPaddingTop = 4;
     this.prompt = "";
   }
 
@@ -59,6 +63,22 @@ class TerminalState {
 
   public getCurrTextLineCmd(): string {
     return this.currTextLineCmd;
+  }
+
+  public setCurrLinePos(currLinePos: Point) {
+    this.currLinePos = currLinePos;
+  }
+
+  public getCurrLinePos(): Point {
+    return this.currLinePos;
+  }
+
+  public setCursorPos(cursorPos: Point) {
+    this.cursorPos = cursorPos;
+  }
+
+  public getCursorPos(): Point {
+    return this.cursorPos;
   }
 }
 
