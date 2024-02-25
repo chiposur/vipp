@@ -30,7 +30,7 @@ class TerminalState {
     this.textLines = [];
     this.currTextLineCmd = ""
     this.textLinePadding = 8;
-    this.cursorPaddingLeft = 8;
+    this.cursorPaddingLeft = 9;
     this.cursorPaddingTop = 4;
     this.prompt = "";
   }
