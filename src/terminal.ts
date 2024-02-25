@@ -10,6 +10,9 @@ class Terminal {
   commands: TerminalCommands
   state: TerminalState
   resizeObserver: ResizeObserver
+  cursorInterval: NodeJS.Timeout
+  cursorVisible: boolean
+  renderInProgress: boolean
 
   public constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
     this.canvas = canvas;
@@ -31,6 +34,7 @@ class Terminal {
     this.syncCanvasResolution();
     this.drawNewPromptRow();
     this.render();
+    this.cursorInterval = setInterval(()=> this.animateCursor(), 800);
   }
 
   private registerHandlers() {
@@ -147,9 +151,11 @@ class Terminal {
   }
 
   private render() {
+    this.renderInProgress = true;
     this.state.currLinePos = new Point(0, 0);
     this.drawBg();
     this.drawTextLines();
+    this.renderInProgress = false;
   }
 
   private drawTextLines() {
@@ -185,11 +191,20 @@ class Terminal {
     this.state.currLinePos.y += numRows * this.getLineHeight(lastLine);
   }
 
+  private animateCursor() {
+    if (!this.renderInProgress) {
+      this.cursorVisible = !this.cursorVisible;
+      this.drawCursor();
+    }
+  }
+
   private drawCursor() {
-    const pos = this.state.cursorPos;
+    const pos = Point.from(this.state.getCursorPos());
     pos.x += this.state.cursorPaddingLeft;
     pos.y += this.state.cursorPaddingTop;
-    this.ctx.fillStyle = this.state.getFontColor();
+    this.ctx.fillStyle = this.cursorVisible ?
+      this.state.getFontColor() :
+      this.state.getBgColor();
     const cursorWidth = 2;
     const cursorHeight = 20;
     this.ctx.fillRect(

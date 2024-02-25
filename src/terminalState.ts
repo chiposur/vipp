@@ -43,6 +43,10 @@ class TerminalState {
     return this.fontColor;
   }
 
+  public getBgColor(): string {
+    return this.bgColor;
+  }
+
   public setCurrDir(folder: Folder) {
     this.currDir = folder;
     this.prompt = `[user@vipp-editor ${this.currDir.name}]$ `
