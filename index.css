@@ -1,4 +1,4 @@
-body, html, #canvas-wrapper {
+body, html {
   margin: 0;
   background-color: black;
   height: 100vh;
@@ -9,4 +9,5 @@ body, html, #canvas-wrapper {
   border: 0;
   width: 100vw;
   height: 99vh;
+  outline: none;
 }

@@ -63,7 +63,7 @@ class Terminal {
   }
 
   private registerHandlers() {
-    const eventTarget = document.getElementById("canvas-wrapper");
+    const eventTarget = document.getElementById("terminal");
     eventTarget.addEventListener("keydown", (e: KeyboardEvent) => this.onKeyDown(e));
   }
 
