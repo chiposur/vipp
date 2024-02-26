@@ -18,6 +18,18 @@ class TerminalCommands {
     this.terminalState = terminalState;
     this.commandMap = new Map();
     this.commandMap.set(
+      'vipp',
+      {
+        name: 'vipp',
+        run: (args?: Array<string>): string => { return this.vipp(args || []) }
+      });
+    this.commandMap.set(
+      'touch',
+      {
+        name: 'touch',
+        run: (args?: Array<string>): string => { return this.touch(args || []) }
+      });
+    this.commandMap.set(
       'ls',
       {
         name: 'ls',
@@ -100,6 +112,16 @@ class TerminalCommands {
     }
     this.cycledCommandIndex = currIndex;
     return this.commandHistory[this.cycledCommandIndex];
+  }
+
+  private vipp(args: Array<string>): string {
+    console.log(`vipp called with ${args.length} args`);
+    return 'vipp not implemented';
+  }
+
+  private touch(args: Array<string>): string {
+    console.log(`touch called with ${args.length} args`);
+    return 'touch not implemented';
   }
 
   private ls(args: Array<string>): string {
