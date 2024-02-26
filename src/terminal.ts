@@ -1,4 +1,4 @@
-import { FileSystem } from './fileSystem'
+import { FileSystem, File } from './fileSystem'
 import { TerminalCommands } from './terminalCommands'
 import { TerminalState } from './terminalState'
 import { Point } from './types'
@@ -13,6 +13,7 @@ class Terminal {
   cursorInterval: NodeJS.Timeout
   cursorVisible: boolean
   renderInProgress: boolean
+  readme: File
 
   public constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
     this.canvas = canvas;
@@ -30,11 +31,35 @@ class Terminal {
     this.state = new TerminalState();
     this.state.setCurrDir(this.fileSystem.root);
     this.commands = new TerminalCommands(this.fileSystem, this.state);
+    this.loadFiles();
     this.registerHandlers();
     this.syncCanvasResolution();
+    this.addReadmeToTextLines();
     this.drawNewPromptRow();
     this.render();
     this.cursorInterval = setInterval(()=> this.animateCursor(), 800);
+  }
+
+  private addReadmeToTextLines() {
+    if (!this.readme) {
+      return;
+    }
+    this.readme.text.split('\n').forEach((line) => {
+      this.state.textLines.push(line);
+    });
+  }
+
+  private loadFiles() {
+    const readmeText = `
+      Vipp Editor
+      © ${new Date().getFullYear()} Chip Osur
+      Usage: https://github.com/chiposur/vipp
+    `;
+    const readme = new File("readme", readmeText);
+    const root = this.fileSystem.root;
+    root.addFile(readme);
+    this.readme = readme;
+    // TODO: load saved files from local storage
   }
 
   private registerHandlers() {
