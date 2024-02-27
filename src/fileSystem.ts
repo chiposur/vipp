@@ -138,6 +138,10 @@ class Folder {
     this.files = [];
   }
 
+  public containsFile(name: string): boolean {
+    return this.files.findIndex((f) => f.name === name) > -1;
+  }
+
   public getName(): string {
     return this.name;
   }

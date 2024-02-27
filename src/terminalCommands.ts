@@ -1,4 +1,4 @@
-import { FileSystem } from './fileSystem'
+import { FileSystem, File } from './fileSystem'
 import { TerminalState } from './terminalState'
 
 class TerminalCommand {
@@ -121,13 +121,24 @@ class TerminalCommands {
 
   private touch(args: Array<string>): string {
     console.log(`touch called with ${args.length} args`);
-    return 'touch not implemented';
+    if (args.length === 0) {
+      return "usage: touch [file]";
+    }
+    const name = args[0];
+    const dir = this.terminalState.getCurrDir();
+    if (dir.containsFile(name)) {
+      return `file "${name}" already exists in current directory`;
+    }
+    dir.addFile(new File(name, ''));
+    return "new empty file created";
   }
 
   private ls(args: Array<string>): string {
     console.log(`ls called with ${args.length} args`);
     const dir = this.terminalState.getCurrDir();
-    const filesAndFolders = `${dir.children.map((f) => f.name)} ${dir.files.map((f) => f.name)}`
+    const folders = `${dir.children.map((f) => f.name).join(" ")}`;
+    const files = `${dir.files.map((f) => f.name).join(" ")}`;
+    const filesAndFolders = `${folders} ${files}`
     return filesAndFolders;
   }
 
