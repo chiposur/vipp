@@ -13,6 +13,7 @@ Vim-like browser based text editor. Currently in active development with limited
 | **mkdir** | Make new directory                                          |
 | **rm**    | Remove file or directory                                    |
 | **pwd**   | Output current working directory                            |
+| **cat**   | Output file text                                            |
 
 ## Available terminal shortcuts
 

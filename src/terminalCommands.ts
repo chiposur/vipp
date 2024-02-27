@@ -59,6 +59,12 @@ class TerminalCommands {
         name: 'pwd',
         run: (args?: Array<string>): string => { return this.pwd(args || []) }
       });
+    this.commandMap.set(
+      'cat',
+      {
+        name: 'cat',
+        run: (args?: Array<string>): string => { return this.cat(args || []) }
+      });
     this.commandHistory = [];
     this.cycledCommandIndex = -1;
   }
@@ -186,6 +192,20 @@ class TerminalCommands {
   private pwd(args: Array<string>): string {
     console.log(`pwd called with ${args.length} args`);
     return this.terminalState.currDir.getFullName();
+  }
+
+  private cat(args: Array<string>): string {
+    console.log(`cat called with ${args.length} args`);
+    if (args.length === 0) {
+      return "usage: cat [file]";
+    }
+    const name = args[0];
+    const dir = this.terminalState.getCurrDir();
+    const file = dir.getFile(name);
+    if (!file) {
+      return `file "${name}" does not exist in current directory`;
+    }
+    return file.text;
   }
 }
 

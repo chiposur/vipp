@@ -176,6 +176,14 @@ class Folder {
     this.files.push(file);
   }
 
+  public getFile(name: string): File {
+    const index = this.files.findIndex((f) => f.name === name);
+    if (index > -1) {
+      return this.files[index];
+    }
+    return null;
+  }
+
   public removeFile(name: string) {
     const index = this.files.findIndex((f) => f.name === name);
     if (index > -1) {

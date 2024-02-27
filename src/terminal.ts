@@ -117,7 +117,8 @@ class Terminal {
       const parsedCommand: string[] = currLineCmd.split(" ");
       const args = parsedCommand.length > 0 ? parsedCommand.slice(1) : [];
       const output = this.commands.processCommand(parsedCommand[0], args);
-      this.state.textLines.push(output);
+      const outputLines = output.split('\n');
+      outputLines.forEach((l) => this.state.textLines.push(l));
       this.moveToNewline();
     }
     this.drawNewPromptRow();
