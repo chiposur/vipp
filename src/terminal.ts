@@ -1,3 +1,4 @@
+import { clearInterval } from 'timers'
 import { FileSystem, File } from './fileSystem'
 import { TerminalCommands } from './terminalCommands'
 import { TerminalState } from './terminalState'
@@ -10,7 +11,7 @@ class Terminal {
   commands: TerminalCommands
   state: TerminalState
   resizeObserver: ResizeObserver
-  cursorInterval: NodeJS.Timeout
+  cursorInterval: number
   cursorVisible: boolean
   renderInProgress: boolean
   readme: File
@@ -37,7 +38,7 @@ class Terminal {
     this.addReadmeToTextLines();
     this.drawNewPromptRow();
     this.render();
-    this.cursorInterval = setInterval(()=> this.animateCursor(), 800);
+    this.cursorInterval = window.setInterval(() => this.animateCursor(), 800);
   }
 
   private addReadmeToTextLines() {
@@ -176,11 +177,52 @@ class Terminal {
   }
 
   private render() {
+    if (this.detectUnsupportedUserAgent()) {
+      window.clearInterval(this.cursorInterval);
+      this.drawUnsupportedBg();
+      return;
+    }
     this.renderInProgress = true;
     this.state.currLinePos = new Point(0, 0);
     this.drawBg();
     this.drawTextLines();
     this.renderInProgress = false;
+  }
+
+  private detectUnsupportedUserAgent(): boolean {
+    const userAgent: string = window.navigator.userAgent;
+    switch (userAgent) {
+      case "/Android/i":
+        return true;
+      case "/BlackBerry/i":
+        return true;
+      case "/iPhone/i":
+        return true;
+      case "/iPad/i":
+        return true;
+      case "/Opera Mini/i":
+        return true;
+      case "/IEMobile/i":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  private drawUnsupportedBg() {
+    this.drawBg();
+    this.setFontStyle();
+    const text = "Mobile browsers are unsupported.";
+    const textMetrics = this.ctx.measureText(text);
+    const x =
+      Math.max(0, Math.floor(this.canvas.width / 2) - Math.floor(textMetrics.width / 2));
+    const y =
+      Math.max(0, Math.floor(this.canvas.height / 2) - Math.floor(this.getLineHeight(text) / 2));
+    this.ctx.fillText(
+      text,
+      x,
+      y,
+    );
   }
 
   private drawTextLines() {
