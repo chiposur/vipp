@@ -126,7 +126,9 @@ class TerminalCommands {
 
   private ls(args: Array<string>): string {
     console.log(`ls called with ${args.length} args`);
-    return 'ls not implemented';
+    const dir = this.terminalState.getCurrDir();
+    const filesAndFolders = `${dir.children.map((f) => f.name)} ${dir.files.map((f) => f.name)}`
+    return filesAndFolders;
   }
 
   private cd(args: Array<string>): string {

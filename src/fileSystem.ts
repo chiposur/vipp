@@ -45,13 +45,13 @@ class FileSystem {
   public resolveFolder(curr: Folder, path: string): FolderResult {
     const seqFolders = path.split('/');
     let result = new FolderResult();
-    if (this.isSequentialFoldersValid(seqFolders)) {
+    if (this.isSequentialFolderPathValid(seqFolders)) {
       result = this.resolveFolderByRelativePath(curr, seqFolders)
     }
     return result;
   }
 
-  private isSequentialFoldersValid(seqFolders: Array<string>): boolean {
+  private isSequentialFolderPathValid(seqFolders: Array<string>): boolean {
     if (seqFolders.length === 0) {
       return false;
     }
