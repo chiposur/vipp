@@ -142,6 +142,10 @@ class Folder {
     return this.files.findIndex((f) => f.name === name) > -1;
   }
 
+  public containsFolder(name: string): boolean {
+    return this.children.findIndex((f) => f.name === name) > -1;
+  }
+
   public getName(): string {
     return this.name;
   }
@@ -170,6 +174,20 @@ class Folder {
 
   public addFile(file: File) {
     this.files.push(file);
+  }
+
+  public removeFile(name: string) {
+    const index = this.files.findIndex((f) => f.name === name);
+    if (index > -1) {
+      this.files.splice(index, 1);
+    }
+  }
+
+  public removeFolder(name: string) {
+    const index = this.children.findIndex((f) => f.name === name);
+    if (index > -1) {
+      this.children.splice(index, 1);
+    }
   }
 }
 

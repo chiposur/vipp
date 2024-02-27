@@ -1,4 +1,4 @@
-import { FileSystem, File } from './fileSystem'
+import { FileSystem, File, Folder } from './fileSystem'
 import { TerminalState } from './terminalState'
 
 class TerminalCommand {
@@ -126,8 +126,8 @@ class TerminalCommands {
     }
     const name = args[0];
     const dir = this.terminalState.getCurrDir();
-    if (dir.containsFile(name)) {
-      return `file "${name}" already exists in current directory`;
+    if (dir.containsFile(name) || dir.containsFolder(name)) {
+      return `"${name}" already exists in current directory`;
     }
     dir.addFile(new File(name, ''));
     return "new empty file created";
@@ -149,12 +149,38 @@ class TerminalCommands {
 
   private mkdir(args: Array<string>): string {
     console.log(`mkdir called with ${args.length} args`);
-    return 'mkdir not implemented';
+    if (args.length === 0) {
+      return "usage: mkdir [folder]";
+    }
+    const name = args[0];
+    const dir = this.terminalState.getCurrDir();
+    if (dir.containsFolder(name) || dir.containsFile(name)) {
+      return `"${name}" already exists in current directory`;
+    }
+    dir.addChildFolder(new Folder(name));
+    return "new folder created";
   }
 
   private rm(args: Array<string>): string {
     console.log(`rm called with ${args.length} args`);
-    return 'rm not implemented';
+    if (args.length === 0) {
+      return "usage: rm [file|folder]";
+    }
+    const name = args[0];
+    const dir = this.terminalState.getCurrDir();
+    const containsFile = dir.containsFile(name);
+    const containsFolder = dir.containsFolder(name);
+    const containsName = containsFile || containsFolder;
+    if (!containsName) {
+      return `"${name}" does not exist in current directory`;
+    }
+    if (containsFile) {
+      dir.removeFile(name);
+    }
+    if (containsFolder) {
+      dir.removeFolder(name);
+    }
+    return "";
   }
 
   private pwd(args: Array<string>): string {
