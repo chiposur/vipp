@@ -133,6 +133,7 @@ class Terminal {
     const cycledCommand = this.commands.cycleCommand(up);
     if (cycledCommand) {
       this.state.setCurrTextLineCmd(cycledCommand);
+      this.state.setCursorIndex(cycledCommand.length);
       this.render();
     }
   }
