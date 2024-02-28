@@ -64,6 +64,16 @@ class TerminalState {
     return this.currDir?.getFullName() || "";
   }
 
+  public setCursorIndex(index: number) {
+    if (index > -1 && index <= this.currTextLineCmd.length) {
+      this.cursorIndex = index;
+    }
+  }
+
+  public getCursorIndex(): number {
+    return this.cursorIndex;
+  }
+
   public setCurrTextLineCmd(cmd: string) {
     this.textLines[this.textLines.length - 1] = `${this.prompt}${cmd}`;
     this.currTextLineCmd = cmd;

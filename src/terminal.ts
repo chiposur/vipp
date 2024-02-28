@@ -74,6 +74,11 @@ class Terminal {
     this.render();
   }
 
+  private clearCurrentLine() {
+    this.state.setCurrTextLineCmd("");
+    this.render();
+  }
+
   private isUTF16(code: string): boolean {
     if (code.length < 0) {
       return false;
@@ -90,6 +95,7 @@ class Terminal {
       const currCmd = this.state.getCurrTextLineCmd();
       const newCmd = `${currCmd}${e.key}`;
       this.state.setCurrTextLineCmd(newCmd);
+      this.state.setCursorIndex(this.state.getCursorIndex() + 1);
       this.render();
     }
   }
@@ -97,17 +103,13 @@ class Terminal {
   private handleBackspace() {
     const currCmd = this.state.getCurrTextLineCmd();
     if (currCmd) {
-      const newCmd = currCmd.substring(0, currCmd.length - 2);
+      const cursorIndex = this.state.getCursorIndex() - 1;
+      const newCmd =
+        currCmd.split('').filter((_, i) => i !== cursorIndex).join('');
       this.state.setCurrTextLineCmd(newCmd);
-      this.state.currLinePos.x -= 1;
-      this.translateCursor(-1, 0);
+      this.state.setCursorIndex(cursorIndex);
       this.render();
     }
-  }
-
-  private clearCurrentLine() {
-    this.state.setCurrTextLineCmd("");
-    this.render();
   }
 
   private handleEnter() {
@@ -133,11 +135,44 @@ class Terminal {
     }
   }
 
+  private findNextWord(startIndex: number, line: string, incrementor: number) {
+    let index = startIndex + incrementor;
+    while (index > 0 && index < line.length) {
+      const nextIndex = index + incrementor;
+      if (nextIndex === 0 || nextIndex === line.length) {
+        return nextIndex;
+      }
+      const nextChar = line[index - 1];
+      if (nextChar === ' ') {
+        return index;
+      }
+      index += incrementor;
+    }
+    return -1;
+  }
+
+  private handleTraverseWord(isLeft: boolean) {
+    const currLine = this.state.getCurrTextLineCmd();
+    const currIndex = this.state.getCursorIndex();
+    const incrementor = isLeft ? -1 : 1;
+    const newIndex = this.findNextWord(currIndex, currLine, incrementor);
+    if (newIndex > -1) {
+      this.state.setCursorIndex(newIndex);
+      this.render();
+    }
+  }
+
+  private handleTraverseCharacter(isLeft: boolean) {
+    const incrementor = isLeft ? -1 : 1;
+    const index = this.state.getCursorIndex() + incrementor;
+    this.state.setCursorIndex(index);
+    this.render();
+  }
+
   private translateCursor(x: number, y: number) {
     const translatedX = Math.max(Math.min(this.state.cursorPos.x + x, this.canvas.width), 0);
     const translatedY = Math.max(Math.min(this.state.cursorPos.y + y, this.canvas.height), 0);
     this.state.cursorPos = new Point(translatedX, translatedY);
-    this.state.cursorIndex = translatedX;
   }
 
   private onKeyDown(e: KeyboardEvent) {
@@ -148,6 +183,16 @@ class Terminal {
     }
     if (e.ctrlKey && e.key === "u") {
       this.clearCurrentLine();
+      e.preventDefault();
+      return;
+    }
+    if (e.ctrlKey && e.key === "ArrowLeft") {
+      this.handleTraverseWord(true);
+      e.preventDefault();
+      return;
+    }
+    if (e.ctrlKey && e.key === "ArrowRight") {
+      this.handleTraverseWord(false);
       e.preventDefault();
       return;
     }
@@ -163,6 +208,12 @@ class Terminal {
         break;
       case "ArrowDown":
         this.handleCycleHistory(false);
+        break;
+      case "ArrowLeft":
+        this.handleTraverseCharacter(true);
+        break;
+      case "ArrowRight":
+        this.handleTraverseCharacter(false);
         break;
       default:
         this.handleKeyPress(e);
@@ -227,6 +278,17 @@ class Terminal {
     );
   }
 
+  private setCursorPosFromIndex() {
+    this.state.setCursorPos(Point.from(this.state.getCurrLinePos()));
+    const index = this.state.getCursorIndex();
+    const cmdText = this.state.getCurrTextLineCmd();
+    const oldPosWidth =
+      this.ctx.measureText(cmdText).width;
+    const newPosWidth =
+      this.ctx.measureText(cmdText.substring(0, index)).width;
+    this.translateCursor(newPosWidth - oldPosWidth, 0);
+  }
+
   private drawTextLines() {
     this.setFontStyle();
     this.state.textLines.forEach((line, index) => {
@@ -235,7 +297,7 @@ class Terminal {
         this.moveToNewline();
       }
     });
-    this.state.setCursorPos(this.state.getCurrLinePos());
+    this.setCursorPosFromIndex();
     this.drawCursor();
   }
 
