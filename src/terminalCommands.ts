@@ -136,7 +136,7 @@ class TerminalCommands {
       return `"${name}" already exists in current directory`;
     }
     dir.addFile(new File(name, ''));
-    return "new empty file created";
+    return "";
   }
 
   private ls(args: Array<string>): string {
@@ -177,7 +177,7 @@ class TerminalCommands {
     const folder = new Folder(name);
     folder.setParent(dir);
     dir.addChildFolder(folder);
-    return "new folder created";
+    return "";
   }
 
   private rm(args: Array<string>): string {
@@ -199,7 +199,7 @@ class TerminalCommands {
     if (containsFolder) {
       dir.removeFolder(name);
     }
-    return `"${name}" deleted`;
+    return "";
   }
 
   private pwd(args: Array<string>): string {
