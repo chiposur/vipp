@@ -159,6 +159,7 @@ class TerminalCommands {
     if (result.exists)
     {
       this.terminalState.setCurrDir(result.folder);
+      return "";
     }
     return `folder path "${path}" does not exist`;
   }
@@ -173,7 +174,9 @@ class TerminalCommands {
     if (dir.containsFolder(name) || dir.containsFile(name)) {
       return `"${name}" already exists in current directory`;
     }
-    dir.addChildFolder(new Folder(name));
+    const folder = new Folder(name);
+    folder.setParent(dir);
+    dir.addChildFolder(folder);
     return "new folder created";
   }
 
