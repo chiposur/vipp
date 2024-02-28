@@ -186,7 +186,7 @@ class TerminalCommands {
     if (containsFolder) {
       dir.removeFolder(name);
     }
-    return "";
+    return `"${name}" deleted`;
   }
 
   private pwd(args: Array<string>): string {
