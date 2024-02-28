@@ -142,15 +142,25 @@ class TerminalCommands {
   private ls(args: Array<string>): string {
     console.log(`ls called with ${args.length} args`);
     const dir = this.terminalState.getCurrDir();
-    const folders = `${dir.children.map((f) => f.name).join(" ")}`;
+    const folders = `${dir.children.map((f) => `${f.name}/`).join(" ")}`;
     const files = `${dir.files.map((f) => f.name).join(" ")}`;
-    const filesAndFolders = `${folders} ${files}`
+    const filesAndFolders = `${folders} ${files}`;
     return filesAndFolders;
   }
 
   private cd(args: Array<string>): string {
     console.log(`cd called with ${args.length} args`);
-    return 'cd not implemented';
+    if (args.length === 0) {
+      return "usage: cd [folder path]";
+    }
+    const dir = this.terminalState.getCurrDir();
+    const path = args[0];
+    const result = this.fileSystem.resolveFolder(dir, path);
+    if (result.exists)
+    {
+      this.terminalState.setCurrDir(result.folder);
+    }
+    return `folder path "${path}" does not exist`;
   }
 
   private mkdir(args: Array<string>): string {
