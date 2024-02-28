@@ -371,6 +371,7 @@ class Terminal {
     this.state.currLinePos.x += textMetrics.width;
     this.state.textLines.push(this.state.prompt);
     this.state.setCurrTextLineCmd("");
+    this.state.setCursorIndex(0);
   }
 
   private setFontStyle() {
