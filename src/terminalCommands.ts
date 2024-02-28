@@ -142,6 +142,9 @@ class TerminalCommands {
   private ls(args: Array<string>): string {
     console.log(`ls called with ${args.length} args`);
     const dir = this.terminalState.getCurrDir();
+    if (dir.children.length === 0 && dir.files.length === 0) {
+      return "";
+    }
     const folders = `${dir.children.map((f) => `${f.name}/`).join(" ")}`;
     const files = `${dir.files.map((f) => f.name).join(" ")}`;
     const filesAndFolders = `${folders} ${files}`;
