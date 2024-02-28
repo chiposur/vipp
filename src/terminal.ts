@@ -93,9 +93,11 @@ class Terminal {
   private handleKeyPress(e: KeyboardEvent) {
     if (e.key.length === 1 && this.isUTF16(e.code)) {
       const currCmd = this.state.getCurrTextLineCmd();
-      const newCmd = `${currCmd}${e.key}`;
+      const index = this.state.getCursorIndex();
+      const newCmd =
+        `${currCmd.substring(0, index)}${e.key}${currCmd.substring(index)}`;
       this.state.setCurrTextLineCmd(newCmd);
-      this.state.setCursorIndex(this.state.getCursorIndex() + 1);
+      this.state.setCursorIndex(index + 1);
       this.render();
     }
   }
