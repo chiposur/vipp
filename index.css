@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'Roboto Mono';
+  src: url("./src/fonts/Roboto_Mono/RobotoMono-VariableFont_wght.ttf");
+}
+
 body, html {
   margin: 0;
   background-color: black;
