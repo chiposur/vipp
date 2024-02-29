@@ -23,7 +23,7 @@ class TerminalState {
     this.cursorPos = new Point(0, 0);
     this.cursorIndex = 0;
     this.currTextLineCmd = ""
-    this.fontName = "sans-serif";
+    this.fontName = "Roboto Mono";
     this.fontSize = "16px";
     this.fontColor = "white";
     this.bgColor = "black";

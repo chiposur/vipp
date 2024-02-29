@@ -359,13 +359,8 @@ class Terminal {
     this.ctx.fillStyle = this.cursorVisible ?
       this.state.getFontColor() :
       this.state.getBgColor();
-    let cursorWidth = 2;
+    const cursorWidth = 2;
     const cursorHeight = 20;
-    // Mitigate cursor animation ghosting when not visible
-    if (!this.cursorVisible) {
-      cursorWidth = 4;
-      pos.x -= 1;
-    }
     this.ctx.fillRect(
       pos.x,
       pos.y,

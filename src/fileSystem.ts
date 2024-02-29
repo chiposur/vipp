@@ -154,7 +154,7 @@ class Folder {
     let fullName = this.name;
     let parent = this.parent;
     while (parent) {
-      fullName = `${parent.name}\\${fullName}`;
+      fullName = `${parent.name}/${fullName}`;
       parent = parent.parent;
     }
     return fullName;
