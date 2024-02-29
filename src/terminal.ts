@@ -348,17 +348,18 @@ class Terminal {
   private animateCursor() {
     if (!this.renderInProgress) {
       this.cursorVisible = !this.cursorVisible;
-      this.drawCursor();
+      this.render();
     }
   }
 
   private drawCursor() {
+    if (!this.cursorVisible) {
+      return;
+    }
     const pos = Point.from(this.state.getCursorPos());
     pos.x += this.state.cursorPaddingLeft;
     pos.y += this.state.cursorPaddingTop;
-    this.ctx.fillStyle = this.cursorVisible ?
-      this.state.getFontColor() :
-      this.state.getBgColor();
+    this.ctx.fillStyle = this.state.getFontColor();
     const cursorWidth = 2;
     const cursorHeight = 20;
     this.ctx.fillRect(
