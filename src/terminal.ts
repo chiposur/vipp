@@ -294,11 +294,29 @@ class Terminal {
     this.translateCursor(newPosWidth - oldPosWidth, 0);
   }
 
+  private getStartingVisibleTextLineIndex() {
+    const textLines = this.state.textLines;
+    const visibleEndIndex = this.state.textLines.length - 1;
+    let visibleStartIndex = 0;
+    let visibleHeight = 0;
+    for (let i = visibleEndIndex; i >= 0; i -= 1) {
+      if (visibleHeight > this.canvas.height) {
+        visibleStartIndex = i + 1;
+        break;
+      }
+      const height = this.getLineHeight(textLines[i]);
+      visibleHeight += height;
+    }
+    return visibleStartIndex;
+  }
+
   private drawTextLines() {
+    const visibleStartIndex = this.getStartingVisibleTextLineIndex();
     this.setFontStyle();
-    this.state.textLines.forEach((line, index) => {
+    const visibleLines = this.state.textLines.slice(visibleStartIndex);
+    visibleLines.forEach((line, index) => {
       this.drawText(line);
-      if (index != this.state.textLines.length - 1) {
+      if (index != visibleLines.length - 1) {
         this.moveToNewline();
       }
     });
