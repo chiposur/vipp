@@ -31,6 +31,7 @@ class Terminal {
     this.state = new TerminalState();
     this.state.setCurrDir(this.fileSystem.root);
     this.commands = new TerminalCommands(this.fileSystem, this.state);
+    this.loadFont();
     this.loadFiles();
     this.registerHandlers();
     this.syncCanvasResolution();
@@ -38,6 +39,15 @@ class Terminal {
     this.drawNewPromptRow();
     this.render();
     this.cursorInterval = window.setInterval(() => this.animateCursor(), 800);
+  }
+
+  private loadFont() {
+    const fontFilename = "roboto.ttf";
+    const font = new FontFace(this.state.getFontName(), `url(${fontFilename})`);
+    font.load().then(() => {
+      this.state.setFontLoaded(true);
+      this.render();
+    });
   }
 
   private addReadmeToTextLines() {
@@ -237,7 +247,11 @@ class Terminal {
   private render() {
     if (this.detectUnsupportedUserAgent()) {
       window.clearInterval(this.cursorInterval);
-      this.drawUnsupportedBg();
+      this.drawUnsupportedFrame();
+      return;
+    }
+    if (!this.state.fontLoaded) {
+      this.drawFontsLoadingFrame();
       return;
     }
     this.renderInProgress = true;
@@ -267,10 +281,9 @@ class Terminal {
     }
   }
 
-  private drawUnsupportedBg() {
+  private drawCenteredMessageFrame(text: string) {
     this.drawBg();
     this.setFontStyle();
-    const text = "Mobile browsers are unsupported.";
     const textMetrics = this.ctx.measureText(text);
     const x =
       Math.max(0, Math.floor(this.canvas.width / 2) - Math.floor(textMetrics.width / 2));
@@ -281,6 +294,16 @@ class Terminal {
       x,
       y,
     );
+  }
+
+  private drawFontsLoadingFrame() {
+    const text = "Fonts loading...";
+    this.drawCenteredMessageFrame(text);
+  }
+
+  private drawUnsupportedFrame() {
+    const text = "Mobile browsers are unsupported.";
+    this.drawCenteredMessageFrame(text);
   }
 
   private setCursorPosFromIndex() {
@@ -392,7 +415,7 @@ class Terminal {
   }
 
   private setFontStyle() {
-    this.ctx.font = this.state.getFont();
+    this.ctx.font = this.state.getFontLoaded() ? this.state.getFont() : this.state.getDefaultFont();
     this.ctx.textBaseline = "top";
     this.ctx.fillStyle = this.state.getFontColor();
   }

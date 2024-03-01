@@ -10,6 +10,7 @@ class TerminalState {
   fontName: string
   fontSize: string
   fontColor: string
+  fontLoaded: boolean
   bgColor: string
   textBaseline: string
   textLines: Array<string>
@@ -26,6 +27,7 @@ class TerminalState {
     this.fontName = "Roboto Mono";
     this.fontSize = "16px";
     this.fontColor = "white";
+    this.fontLoaded = false;
     this.bgColor = "black";
     this.textLines = [];
     this.currTextLineCmd = ""
@@ -33,6 +35,14 @@ class TerminalState {
     this.cursorPaddingLeft = 9;
     this.cursorPaddingTop = 4;
     this.prompt = "";
+  }
+
+  public getDefaultFont(): string {
+    return `24px Arial`
+  }
+
+  public getFontName(): string {
+    return this.fontName;
   }
 
   public getFont(): string {
@@ -45,6 +55,14 @@ class TerminalState {
 
   public getBgColor(): string {
     return this.bgColor;
+  }
+
+  public setFontLoaded(loaded: boolean) {
+    this.fontLoaded = loaded;
+  }
+
+  public getFontLoaded(): boolean {
+    return this.fontLoaded;
   }
 
   public getCurrDir(): Folder {

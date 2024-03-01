@@ -32,7 +32,14 @@ const config = {
                 use: [stylesHandler,'css-loader'],
             },
             {
-                test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
+                test: /RobotoMono-VariableFont_wght\.ttf$/i,
+                type: 'asset/resource',
+                generator: {
+                    filename: 'roboto.ttf',
+                }
+            },
+            {
+                test: /\.(woff|woff2|png|jpg|gif)$/i,
                 type: 'asset/resource',
             },
         ],
