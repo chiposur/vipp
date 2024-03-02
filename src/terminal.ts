@@ -1,4 +1,5 @@
 import { FileSystem, File } from './fileSystem'
+import { Storage } from './storage'
 import { TerminalCommands } from './terminalCommands'
 import { TerminalState } from './terminalState'
 import { Point } from './types'
@@ -27,7 +28,7 @@ class Terminal {
   }
 
   private init() {
-    this.fileSystem = new FileSystem();
+    this.fileSystem = Storage.loadFileSystem();
     this.state = new TerminalState();
     this.state.setCurrDir(this.fileSystem.root);
     this.commands = new TerminalCommands(this.fileSystem, this.state);
