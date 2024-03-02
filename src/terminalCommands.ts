@@ -3,7 +3,12 @@ import { TerminalState } from './terminalState'
 
 class TerminalCommand {
   name: string
-  run: (args?: Array<string>) => string
+  run: (args?: Array<string>) => CommandResult
+}
+
+class CommandResult {
+  ExitStatus: number
+  Output: Array<string>
 }
 
 class TerminalCommands {
@@ -21,55 +26,55 @@ class TerminalCommands {
       'vipp',
       {
         name: 'vipp',
-        run: (args?: Array<string>): string => { return this.vipp(args || []) }
+        run: (args?: Array<string>): CommandResult => { return this.vipp(args || []) }
       });
     this.commandMap.set(
       'touch',
       {
         name: 'touch',
-        run: (args?: Array<string>): string => { return this.touch(args || []) }
+        run: (args?: Array<string>): CommandResult => { return this.touch(args || []) }
       });
     this.commandMap.set(
       'ls',
       {
         name: 'ls',
-        run: (args?: Array<string>): string => { return this.ls(args || []) }
+        run: (args?: Array<string>): CommandResult => { return this.ls(args || []) }
       });
     this.commandMap.set(
       'cd',
       {
         name: 'cd',
-        run: (args?: Array<string>): string => { return this.cd(args || []) }
+        run: (args?: Array<string>): CommandResult => { return this.cd(args || []) }
       });
     this.commandMap.set(
       'mkdir',
       {
         name: 'mkdir',
-        run: (args?: Array<string>): string => { return this.mkdir(args || []) }
+        run: (args?: Array<string>): CommandResult => { return this.mkdir(args || []) }
       });
     this.commandMap.set(
       'rm',
       {
         name: 'rm',
-        run: (args?: Array<string>): string => { return this.rm(args || []) }
+        run: (args?: Array<string>): CommandResult => { return this.rm(args || []) }
       });
     this.commandMap.set(
       'pwd',
       {
         name: 'pwd',
-        run: (args?: Array<string>): string => { return this.pwd(args || []) }
+        run: (args?: Array<string>): CommandResult => { return this.pwd(args || []) }
       });
     this.commandMap.set(
       'cat',
       {
         name: 'cat',
-        run: (args?: Array<string>): string => { return this.cat(args || []) }
+        run: (args?: Array<string>): CommandResult => { return this.cat(args || []) }
       });
     this.commandHistory = [];
     this.cycledCommandIndex = -1;
   }
 
-  public processCommand(command: string, args?: Array<string>): string {
+  public processCommand(command: string, args?: Array<string>): CommandResult {
     this.cycledCommandIndex = -1;
     const argsText = args ? ` ${args.join(' ')}` : '';
     this.commandHistory.push(`${command}${argsText}`)
@@ -77,7 +82,10 @@ class TerminalCommands {
       const terminalCommand: TerminalCommand = this.commandMap.get(command);
       return terminalCommand.run(args || []);
     }
-    return `${command}: command not found`;
+    return {
+      ExitStatus: 1,
+      Output: [`${command}: command not found`]
+    };
   }
 
   // cycleCommand returns a command forwards or backwards in history
@@ -120,41 +128,62 @@ class TerminalCommands {
     return this.commandHistory[this.cycledCommandIndex];
   }
 
-  private vipp(args: Array<string>): string {
+  private vipp(args: Array<string>): CommandResult {
     console.log(`vipp called with ${args.length} args`);
-    return 'vipp not implemented';
+    return {
+      ExitStatus: 1,
+      Output: ['vipp not implemented']
+    };
   }
 
-  private touch(args: Array<string>): string {
+  private touch(args: Array<string>): CommandResult {
     console.log(`touch called with ${args.length} args`);
     if (args.length === 0) {
-      return "usage: touch [file]";
+      return {
+        ExitStatus: 1,
+        Output: ['usage: touch [file]']
+      };
     }
     const name = args[0];
     const dir = this.terminalState.getCurrDir();
     if (dir.containsFile(name) || dir.containsFolder(name)) {
-      return `"${name}" already exists in current directory`;
+      return {
+        ExitStatus: 1,
+        Output: [`"${name}" already exists in current directory`],
+      };
     }
     dir.addFile(new File(name, ''));
-    return "";
+    return {
+      ExitStatus: 0,
+      Output: [],
+    };
   }
 
-  private ls(args: Array<string>): string {
+  private ls(args: Array<string>): CommandResult {
     console.log(`ls called with ${args.length} args`);
     const dir = this.terminalState.getCurrDir();
     if (dir.children.length === 0 && dir.files.length === 0) {
-      return "";
+      return {
+        ExitStatus: 0,
+        Output: [],
+      };
     }
     const folders = `${dir.children.map((f) => `${f.name}/`).join(" ")}`;
     const files = `${dir.files.map((f) => f.name).join(" ")}`;
     const filesAndFolders = `${folders} ${files}`;
-    return filesAndFolders;
+    return {
+      ExitStatus: 0,
+      Output: [filesAndFolders],
+    };
   }
 
-  private cd(args: Array<string>): string {
+  private cd(args: Array<string>): CommandResult {
     console.log(`cd called with ${args.length} args`);
     if (args.length === 0) {
-      return "usage: cd [folder path]";
+      return {
+        ExitStatus: 1,
+        Output: ["usage: cd [folder path]"],
+      };
     }
     const dir = this.terminalState.getCurrDir();
     const path = args[0];
@@ -162,31 +191,49 @@ class TerminalCommands {
     if (result.exists)
     {
       this.terminalState.setCurrDir(result.folder);
-      return "";
+      return {
+        ExitStatus: 0,
+        Output: [],
+      };
     }
-    return `folder path "${path}" does not exist`;
+    return {
+      ExitStatus: 1,
+      Output: [`folder path "${path}" does not exist`],
+    };
   }
 
-  private mkdir(args: Array<string>): string {
+  private mkdir(args: Array<string>): CommandResult {
     console.log(`mkdir called with ${args.length} args`);
     if (args.length === 0) {
-      return "usage: mkdir [folder]";
+      return {
+        ExitStatus: 1,
+        Output: ["usage: mkdir [folder]"]
+      };
     }
     const name = args[0];
     const dir = this.terminalState.getCurrDir();
     if (dir.containsFolder(name) || dir.containsFile(name)) {
-      return `"${name}" already exists in current directory`;
+      return {
+        ExitStatus: 1,
+        Output: [`"${name}" already exists in current directory`],
+      };
     }
     const folder = new Folder(name);
     folder.setParent(dir);
     dir.addChildFolder(folder);
-    return "";
+    return {
+      ExitStatus: 0,
+      Output: [],
+    };
   }
 
-  private rm(args: Array<string>): string {
+  private rm(args: Array<string>): CommandResult {
     console.log(`rm called with ${args.length} args`);
     if (args.length === 0) {
-      return "usage: rm [file|folder]";
+      return {
+        ExitStatus: 1,
+        Output: ["usage: rm [file|folder]"]
+      };
     }
     const name = args[0];
     const dir = this.terminalState.getCurrDir();
@@ -194,7 +241,10 @@ class TerminalCommands {
     const containsFolder = dir.containsFolder(name);
     const containsName = containsFile || containsFolder;
     if (!containsName) {
-      return `"${name}" does not exist in current directory`;
+      return {
+        ExitStatus: 1,
+        Output: [`"${name}" does not exist in current directory`]
+      };
     }
     if (containsFile) {
       dir.removeFile(name);
@@ -202,27 +252,42 @@ class TerminalCommands {
     if (containsFolder) {
       dir.removeFolder(name);
     }
-    return "";
+    return {
+      ExitStatus: 0,
+      Output: [],
+    };
   }
 
-  private pwd(args: Array<string>): string {
+  private pwd(args: Array<string>): CommandResult {
     console.log(`pwd called with ${args.length} args`);
-    return this.terminalState.currDir.getFullName();
+    return {
+      ExitStatus: 0,
+      Output: [this.terminalState.currDir.getFullName()],
+    };
   }
 
-  private cat(args: Array<string>): string {
+  private cat(args: Array<string>): CommandResult {
     console.log(`cat called with ${args.length} args`);
     if (args.length === 0) {
-      return "usage: cat [file]";
+      return {
+        ExitStatus: 1,
+        Output: ["usage: cat [file]"],
+      };
     }
     const name = args[0];
     const dir = this.terminalState.getCurrDir();
     const file = dir.getFile(name);
     if (!file) {
-      return `file "${name}" does not exist in current directory`;
+      return {
+        ExitStatus: 1,
+        Output: [`file "${name}" does not exist in current directory`]
+      };
     }
-    return file.text;
+    return {
+      ExitStatus: 0,
+      Output: [file.text],
+    }
   }
 }
 
-export { TerminalCommand, TerminalCommands };
+export { TerminalCommand, CommandResult, TerminalCommands };
