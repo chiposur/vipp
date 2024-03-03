@@ -1,4 +1,4 @@
-import { FileSystem, Folder } from './fileSystem'
+import { FileSystem, Folder, File } from './fileSystem'
 
 class Storage {
   static rootKey: string = "FILE_SYSTEM_ROOT";
@@ -18,6 +18,18 @@ class Storage {
       }
     }
     return fs;
+  }
+
+  static saveFileText(file: File) {
+    window.localStorage.setItem(file.getAbsolutePath(), file.text);
+  }
+
+  static loadFileText(absolutePath: string): string {
+    const text = window.localStorage.getItem(absolutePath);
+    if (text) {
+      return text;
+    }
+    return "";
   }
 
   static serializeFolder(folder: Folder): string {

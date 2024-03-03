@@ -107,13 +107,28 @@ class FileSystem {
   }
 }
 
+class SerializedFile {
+  name: string
+  absolutePath: string
+
+  public constructor() {
+    this.name = "";
+    this.absolutePath = "";
+  }
+}
+
 class File {
   name: string
   text: string
+  parent: Folder
 
   public constructor(name: string, text: string) {
     this.name = name;
     this.text = text;
+  }
+
+  public setParent(parent: Folder) {
+    this.parent = parent;
   }
 
   public setName(name: string) {
@@ -122,6 +137,25 @@ class File {
 
   public setText(text: string) {
     this.text = text;
+  }
+
+  public getAbsolutePath(): string {
+    const pathParts = [];
+    let currFolder = parent;
+    while (currFolder) {
+      pathParts.push(currFolder.name);
+      currFolder = currFolder.parent;
+    }
+    pathParts.reverse();
+    pathParts.push(this.name);
+    return pathParts.join("/");
+  }
+
+  public toJSON(): SerializedFile {
+    return {
+      name: this.name,
+      absolutePath: this.getAbsolutePath(),
+    };
   }
 }
 
