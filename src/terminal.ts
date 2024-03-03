@@ -101,6 +101,12 @@ class Terminal {
     return code.charCodeAt(0) <= 65535;
   }
 
+  private getMaxCharactersPerRow(): number {
+    const monospacedCharacter = "a";
+    const textMetrics = this.ctx.measureText(monospacedCharacter);
+    return Math.floor(this.canvas.width / textMetrics.width);
+  }
+
   private handleKeyPress(e: KeyboardEvent) {
     if (e.key.length === 1 && this.isUTF16(e.code)) {
       const currCmd = this.state.getCurrTextLineCmd();
@@ -288,7 +294,7 @@ class Terminal {
     const x =
       Math.max(0, Math.floor(this.canvas.width / 2) - Math.floor(textMetrics.width / 2));
     const y =
-      Math.max(0, Math.floor(this.canvas.height / 2) - Math.floor(this.getLineHeight(text) / 2));
+      Math.max(0, Math.floor(this.canvas.height / 2) - Math.floor(this.getLineHeight() / 2));
     this.ctx.fillText(
       text,
       x,
@@ -318,17 +324,16 @@ class Terminal {
   }
 
   private getStartingVisibleTextLineIndex() {
-    const textLines = this.state.textLines;
     const visibleEndIndex = this.state.textLines.length - 1;
     let visibleStartIndex = 0;
     let visibleHeight = 0;
+    const lineHeight = this.getLineHeight();
     for (let i = visibleEndIndex; i >= 0; i -= 1) {
       if (visibleHeight > this.canvas.height) {
         visibleStartIndex = i + 1;
         break;
       }
-      const height = this.getLineHeight(textLines[i]);
-      visibleHeight += height;
+      visibleHeight += lineHeight;
     }
     return visibleStartIndex;
   }
@@ -352,20 +357,17 @@ class Terminal {
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
-  private getLineHeight(textLine: string) {
-    const textMetrics = this.ctx.measureText(textLine);
+  private getLineHeight() {
+    const monospacedCharacter = "a";
+    const textMetrics = this.ctx.measureText(monospacedCharacter);
     return textMetrics.fontBoundingBoxAscent +
       textMetrics.fontBoundingBoxDescent +
       this.state.textLinePadding;
   }
 
   private moveToNewline() {
-    const lastLine = this.state.textLines[this.state.textLines.length - 1];
-    const textMetrics = this.ctx.measureText(lastLine);
-    const lineWidth = textMetrics.width;
-    const numRows = Math.max(1, Math.ceil(lineWidth / this.canvas.width));
     this.state.currLinePos.x = 0;
-    this.state.currLinePos.y += numRows * this.getLineHeight(lastLine);
+    this.state.currLinePos.y += this.getLineHeight();
   }
 
   private animateCursor() {
@@ -393,12 +395,22 @@ class Terminal {
   }
 
   private drawText(textLine: string) {
-    this.ctx.fillText(
-      textLine,
-      this.state.currLinePos.x + this.state.textLinePadding,
-      this.state.currLinePos.y + this.state.textLinePadding);
-    const textMetrics = this.ctx.measureText(textLine);
-    this.state.currLinePos.x += textMetrics.width;
+    const maxWidth = this.getMaxCharactersPerRow();
+    let textToDraw = textLine;
+    while (textToDraw.length > 0) {
+      const rowTextLength = Math.min(maxWidth, textToDraw.length);
+      const rowText = textToDraw.substring(0, rowTextLength);
+      this.ctx.fillText(
+        rowText,
+        this.state.currLinePos.x + this.state.textLinePadding,
+        this.state.currLinePos.y + this.state.textLinePadding);
+      const textMetrics = this.ctx.measureText(textToDraw);
+      this.state.currLinePos.x += textMetrics.width;
+      textToDraw = textToDraw.substring(rowTextLength);
+      if (textToDraw.length > 0) {
+        this.moveToNewline();
+      }
+    }
   }
 
   private drawNewPromptRow() {

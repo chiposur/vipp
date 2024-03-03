@@ -285,7 +285,7 @@ class TerminalCommands {
     }
     return {
       ExitStatus: 0,
-      Output: [file.text],
+      Output: file.text.split('\n'),
     }
   }
 }
