@@ -1,4 +1,4 @@
-import { FileSystem, Folder, File } from './fileSystem'
+import { FileSystem, Folder, File, SerializedFolder } from './fileSystem'
 
 class Storage {
   static rootKey: string = "FILE_SYSTEM_ROOT";
@@ -24,6 +24,10 @@ class Storage {
     window.localStorage.setItem(file.getAbsolutePath(), file.text);
   }
 
+  static removeFileText(file: File) {
+    window.localStorage.removeItem(file.getAbsolutePath());
+  }
+
   static loadFileText(absolutePath: string): string {
     const text = window.localStorage.getItem(absolutePath);
     if (text) {
@@ -36,8 +40,10 @@ class Storage {
     return JSON.stringify(folder);
   }
 
-  static deserializeFolder(serializedFolder: string): Folder {
-    const folder: Folder = JSON.parse(serializedFolder);
+  static deserializeFolder(serializedFolderJSON: string): Folder {
+    const serializedFolder: SerializedFolder = JSON.parse(serializedFolderJSON);
+    const folder = new Folder(serializedFolder.name);
+    // TODO: fix function by transforming SerializedFolder result into nested Folder structure
     return folder;
   }
 }

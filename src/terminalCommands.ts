@@ -1,4 +1,5 @@
 import { FileSystem, File, Folder } from './fileSystem'
+import { Storage } from './storage'
 import { TerminalState } from './terminalState'
 
 class TerminalCommand {
@@ -152,7 +153,11 @@ class TerminalCommands {
         Output: [`"${name}" already exists in current directory`],
       };
     }
-    dir.addFile(new File(name, ''));
+    const file = new File(name, '');
+    file.setParent(dir);
+    dir.addFile(file);
+    Storage.saveFileText(file);
+    Storage.saveFileSystem(this.fileSystem.root);
     return {
       ExitStatus: 0,
       Output: [],
@@ -221,6 +226,7 @@ class TerminalCommands {
     const folder = new Folder(name);
     folder.setParent(dir);
     dir.addChildFolder(folder);
+    Storage.saveFileSystem(this.fileSystem.root);
     return {
       ExitStatus: 0,
       Output: [],
@@ -247,6 +253,9 @@ class TerminalCommands {
       };
     }
     if (containsFile) {
+      const index = dir.files.findIndex((f) => f.name === name);
+      const file = dir.files[index];
+      Storage.removeFileText(file);
       dir.removeFile(name);
     }
     if (containsFolder) {
