@@ -52,9 +52,9 @@ class Storage {
         const folder = this.createFolder(serializedFolder);
         return folder;
       } catch (error) {
-        console.log(
+        console.warn(
           `Could not parse file system in local storage key "${this.rootKey}"`);
-        console.log("Defaulting to empty file system.");
+        console.log("Defaulting to empty file system...");
       }
     }
     return null;
@@ -71,8 +71,15 @@ class Storage {
     this.createFiles(folder, serializedFolder.files);
     while (nLevelChildren.length > 0) {
       const nextLevelChildren: Array<NLevelChild> = [];
+      const nameMap = new Map<string, boolean>();
       nLevelChildren.forEach((c) => {
-        const newFolder = new Folder(c.serializedFolder.name);
+        const name = c.serializedFolder.name;
+        if (nameMap.has(name)) {
+          console.warn("Duplicate folder path detected; skipping...");
+          return;
+        }
+        nameMap.set(name, true);
+        const newFolder = new Folder(name);
         newFolder.setParent(c.parentFolder);
         c.parentFolder.addChildFolder(newFolder);
         this.createFiles(newFolder, c.serializedFolder.files);
@@ -89,7 +96,13 @@ class Storage {
   }
 
   static createFiles(folder: Folder, serializedFiles: Array<SerializedFile>) {
+    const nameMap = new Map<string, boolean>();
     serializedFiles.forEach((f) => {
+      if (nameMap.has(f.name)) {
+        console.warn("Duplicate file path detected; skipping...");
+        return;
+      }
+      nameMap.set(f.name, true);
       const file = new File(f.name, "");
       file.setParent(folder);
       folder.addFile(file);
