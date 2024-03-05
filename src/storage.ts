@@ -74,13 +74,13 @@ class Storage {
       const nameMap = new Map<string, boolean>();
       nLevelChildren.forEach((c) => {
         const name = c.serializedFolder.name;
-        if (nameMap.has(name)) {
+        const newFolder = new Folder(name);
+        newFolder.setParent(c.parentFolder);
+        if (nameMap.has(newFolder.getFullName())) {
           console.warn("Duplicate folder path detected; skipping...");
           return;
         }
-        nameMap.set(name, true);
-        const newFolder = new Folder(name);
-        newFolder.setParent(c.parentFolder);
+        nameMap.set(newFolder.getFullName(), true);
         c.parentFolder.addChildFolder(newFolder);
         this.createFiles(newFolder, c.serializedFolder.files);
         c.serializedFolder.children.forEach((sf) => {
