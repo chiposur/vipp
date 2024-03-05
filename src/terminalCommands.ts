@@ -261,6 +261,7 @@ class TerminalCommands {
     if (containsFolder) {
       dir.removeFolder(name);
     }
+    Storage.saveFileSystem(this.fileSystem.root);
     return {
       ExitStatus: 0,
       Output: [],

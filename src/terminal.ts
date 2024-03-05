@@ -74,7 +74,6 @@ class Terminal {
     const root = this.fileSystem.root;
     root.addFile(readme);
     this.readme = readme;
-    // TODO: load saved files from local storage
   }
 
   private registerHandlers() {
