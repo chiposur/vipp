@@ -43,8 +43,13 @@ class FileSystem {
   }
 
   public resolveFolder(curr: Folder, path: string): FolderResult {
-    const seqFolders = path.split('/');
     let result = new FolderResult();
+    if (this.isReservedFoldername(path)) {
+      result.exists = true;
+      result.folder = this.updateCurrentFolderFromReservedName(curr, path);
+      return result;
+    }
+    const seqFolders = path.split('/');
     if (this.isSequentialFolderPathValid(seqFolders)) {
       result = this.resolveFolderByRelativePath(curr, seqFolders)
     }

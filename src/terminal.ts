@@ -61,6 +61,10 @@ class Terminal {
   }
 
   private loadFiles() {
+    if (this.state.currDir.containsFile("readme")) {
+      // ~/readme is special file that should not be overwriteable
+      this.state.currDir.files = this.state.currDir.files.filter((f) => f.name !== "readme");
+    }
     const readmeText = `
       Vipp Editor
       © ${new Date().getFullYear()} Chip Osur
