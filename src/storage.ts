@@ -48,8 +48,14 @@ class Storage {
   static deserializeFolder(serializedFolderJSON: string): Folder {
     const serializedFolder: SerializedFolder = JSON.parse(serializedFolderJSON);
     if (serializedFolder) {
-      const folder = this.createFolder(serializedFolder);
-      return folder;
+      try {
+        const folder = this.createFolder(serializedFolder);
+        return folder;
+      } catch (error) {
+        console.log(
+          `Could not parse file system in local storage key "${this.rootKey}"`);
+        console.log("Defaulting to empty file system.");
+      }
     }
     return null;
   }
