@@ -60,9 +60,10 @@ class FileSystem {
     if (seqFolders.length === 0) {
       return false;
     }
-    const firstFoldername = seqFolders[0];
-    if (!this.isReservedFoldername(firstFoldername) && !this.isValidFoldername(firstFoldername)) {
-      return false;
+    let firstFoldername = seqFolders[0];
+    while (this.isReservedFoldername(firstFoldername)) {
+      seqFolders = seqFolders.slice(1, seqFolders.length - 1);
+      firstFoldername = seqFolders[0];
     }
     for (let i = 1; i < seqFolders.length; i += 1) {
       const name = seqFolders[i];
@@ -87,15 +88,15 @@ class FileSystem {
     if (!curr || seqFolders.length === 0) {
       return result;
     }
-    const firstFoldername = seqFolders[0];
-    if (this.isReservedFoldername(firstFoldername)) {
-      seqFolders = seqFolders.slice(1, seqFolders.length - 1);
+    let firstFoldername = seqFolders[0];
+    while (this.isReservedFoldername(firstFoldername)) {
       curr = this.updateCurrentFolderFromReservedName(curr, firstFoldername);
+      seqFolders.splice(0, 1);
+      firstFoldername = seqFolders[0];
     }
     if (!curr) {
       return result;
     }
-    let folder: Folder;
     let currIndex = 0;
     if (seqFolders.length === 0) {
       result.exists = true;
@@ -103,16 +104,16 @@ class FileSystem {
       return result;
     }
     while (currIndex < seqFolders.length) {
-      const foundIndex = curr.children.findIndex(f => f.name === seqFolders[currIndex]);
+      const foundIndex = curr.children.findIndex(c => c.name === seqFolders[currIndex]);
       if (foundIndex > -1) {
-        folder = curr.children[foundIndex];
+        curr = curr.children[foundIndex];
         currIndex += 1;
       } else {
         return result;
       }
     }
     result.exists = true;
-    result.folder = folder;
+    result.folder = curr;
     return result;
   }
 }
