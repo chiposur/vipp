@@ -97,6 +97,11 @@ class FileSystem {
     }
     let folder: Folder;
     let currIndex = 0;
+    if (seqFolders.length === 0) {
+      result.exists = true;
+      result.folder = curr;
+      return result;
+    }
     while (currIndex < seqFolders.length) {
       const foundIndex = curr.children.findIndex(f => f.name === seqFolders[currIndex]);
       if (foundIndex > -1) {
