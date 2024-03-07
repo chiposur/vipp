@@ -76,7 +76,9 @@ class FileSystem {
 
   private updateCurrentFolderFromReservedName(curr: Folder, reservedFoldername: string): Folder {
     if (reservedFoldername === "..") {
-      curr = curr.parent;
+      if (curr.parent) {
+        curr = curr.parent;
+      }
     } else if (reservedFoldername === "~") {
       curr = this.root;
     }
