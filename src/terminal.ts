@@ -83,7 +83,7 @@ class Terminal {
 
   private clearTerminal() {
     this.state.textLines = [];
-    this.state.setCurrLinePos(Point.from(this.state.getNewStartingPos()));
+    this.state.setCurrLinePos(this.state.getNewStartingPos());
     this.drawNewPromptRow();
     this.render();
   }
