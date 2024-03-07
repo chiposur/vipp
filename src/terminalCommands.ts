@@ -146,7 +146,7 @@ class TerminalCommands {
       };
     }
     const name = args[0];
-    const dir = this.terminalState.getCurrDir();
+    const dir = this.terminalState.currDir;
     if (dir.containsFile(name) || dir.containsFolder(name)) {
       return {
         ExitStatus: 1,
@@ -166,7 +166,7 @@ class TerminalCommands {
 
   private ls(args: Array<string>): CommandResult {
     console.log(`ls called with ${args.length} args`);
-    const dir = this.terminalState.getCurrDir();
+    const dir = this.terminalState.currDir;
     if (dir.children.length === 0 && dir.files.length === 0) {
       return {
         ExitStatus: 0,
@@ -190,7 +190,7 @@ class TerminalCommands {
         Output: ["usage: cd [folder path]"],
       };
     }
-    const dir = this.terminalState.getCurrDir();
+    const dir = this.terminalState.currDir;
     const path = args[0];
     const result = this.fileSystem.resolveFolder(dir, path);
     if (result.exists)
@@ -216,7 +216,7 @@ class TerminalCommands {
       };
     }
     const name = args[0];
-    const dir = this.terminalState.getCurrDir();
+    const dir = this.terminalState.currDir;
     if (dir.containsFolder(name) || dir.containsFile(name)) {
       return {
         ExitStatus: 1,
@@ -242,7 +242,7 @@ class TerminalCommands {
       };
     }
     const name = args[0];
-    const dir = this.terminalState.getCurrDir();
+    const dir = this.terminalState.currDir;
     const containsFile = dir.containsFile(name);
     const containsFolder = dir.containsFolder(name);
     const containsName = containsFile || containsFolder;
@@ -285,7 +285,7 @@ class TerminalCommands {
       };
     }
     const name = args[0];
-    const dir = this.terminalState.getCurrDir();
+    const dir = this.terminalState.currDir;
     const file = dir.getFile(name);
     if (!file) {
       return {

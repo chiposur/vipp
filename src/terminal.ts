@@ -5,16 +5,16 @@ import { TerminalState } from './terminalState'
 import { Point } from './types'
 
 class Terminal {
-  canvas: HTMLCanvasElement
-  ctx: CanvasRenderingContext2D
-  fileSystem: FileSystem
-  commands: TerminalCommands
-  state: TerminalState
-  resizeObserver: ResizeObserver
-  cursorInterval: number
-  cursorVisible: boolean
-  renderInProgress: boolean
-  readme: File
+  private canvas: HTMLCanvasElement
+  private ctx: CanvasRenderingContext2D
+  private fileSystem: FileSystem
+  private commands: TerminalCommands
+  private state: TerminalState
+  private resizeObserver: ResizeObserver
+  private cursorInterval: number
+  private cursorVisible: boolean
+  private renderInProgress: boolean
+  private readme: File
 
   public constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
     this.canvas = canvas;
@@ -44,9 +44,9 @@ class Terminal {
 
   private loadFont() {
     const fontFilename = "roboto.ttf";
-    const font = new FontFace(this.state.getFontName(), `url(${fontFilename})`);
+    const font = new FontFace(this.state.fontName, `url(${fontFilename})`);
     font.load().then(() => {
-      this.state.setFontLoaded(true);
+      this.state.fontLoaded = true;
       this.render();
     });
   }
@@ -83,7 +83,7 @@ class Terminal {
 
   private clearTerminal() {
     this.state.textLines = [];
-    this.state.setCurrLinePos(this.state.getNewStartingPos());
+    this.state.currLinePos = this.state.getNewStartingPos();
     this.drawNewPromptRow();
     this.render();
   }
@@ -112,8 +112,8 @@ class Terminal {
 
   private handleKeyPress(e: KeyboardEvent) {
     if (e.key.length === 1 && this.isUTF16(e.code)) {
-      const currCmd = this.state.getCurrTextLineCmd();
-      const index = this.state.getCursorIndex();
+      const currCmd = this.state.currTextLineCmd;
+      const index = this.state.cursorIndex;
       const newCmd =
         `${currCmd.substring(0, index)}${e.key}${currCmd.substring(index)}`;
       this.state.setCurrTextLineCmd(newCmd);
@@ -123,9 +123,9 @@ class Terminal {
   }
 
   private handleBackspace() {
-    const currCmd = this.state.getCurrTextLineCmd();
+    const currCmd = this.state.currTextLineCmd;
     if (currCmd) {
-      const cursorIndex = this.state.getCursorIndex() - 1;
+      const cursorIndex = this.state.cursorIndex - 1;
       const newCmd =
         currCmd.split('').filter((_, i) => i !== cursorIndex).join('');
       this.state.setCurrTextLineCmd(newCmd);
@@ -136,7 +136,7 @@ class Terminal {
 
   private handleEnter() {
     this.moveToNewline();
-    const currLineCmd = this.state.getCurrTextLineCmd();
+    const currLineCmd = this.state.currTextLineCmd;
     if (currLineCmd) {
       const parsedCommand: string[] = currLineCmd.split(" ");
       const args = parsedCommand.length > 0 ? parsedCommand.slice(1) : [];
@@ -176,8 +176,8 @@ class Terminal {
   }
 
   private handleTraverseWord(isLeft: boolean) {
-    const currLine = this.state.getCurrTextLineCmd();
-    const currIndex = this.state.getCursorIndex();
+    const currLine = this.state.currTextLineCmd;
+    const currIndex = this.state.cursorIndex;
     const incrementor = isLeft ? -1 : 1;
     const newIndex = this.findNextWord(currIndex, currLine, incrementor);
     if (newIndex > -1) {
@@ -188,7 +188,7 @@ class Terminal {
 
   private handleTraverseCharacter(isLeft: boolean) {
     const incrementor = isLeft ? -1 : 1;
-    const index = this.state.getCursorIndex() + incrementor;
+    const index = this.state.cursorIndex + incrementor;
     this.state.setCursorIndex(index);
     this.render();
   }
@@ -264,7 +264,7 @@ class Terminal {
       return;
     }
     this.renderInProgress = true;
-    this.state.setCurrLinePos(this.state.getNewStartingPos());
+    this.state.currLinePos = this.state.getNewStartingPos();
     this.drawBg();
     this.drawTextLines();
     this.renderInProgress = false;
@@ -316,9 +316,9 @@ class Terminal {
   }
 
   private setCursorPosFromIndex() {
-    this.state.setCursorPos(Point.from(this.state.getCurrLinePos()));
-    const index = this.state.getCursorIndex();
-    const cmdText = this.state.getCurrTextLineCmd();
+    this.state.cursorPos = Point.from(this.state.currLinePos);
+    const index = this.state.cursorIndex;
+    const cmdText = this.state.currTextLineCmd;
     const oldPosWidth =
       this.ctx.measureText(cmdText).width;
     const newPosWidth =
@@ -368,7 +368,7 @@ class Terminal {
   }
 
   private moveToNewline() {
-    const currLinePos = this.state.getCurrLinePos();
+    const currLinePos = this.state.currLinePos;
     currLinePos.x = this.state.getNewStartingPos().x;
     currLinePos.y += this.getLineHeight();
   }
@@ -384,10 +384,10 @@ class Terminal {
     if (!this.cursorVisible) {
       return;
     }
-    const pos = Point.from(this.state.getCursorPos());
+    const pos = Point.from(this.state.cursorPos);
     pos.x += this.state.cursorPaddingLeft;
     pos.y += this.state.cursorPaddingTop;
-    this.ctx.fillStyle = this.state.getFontColor();
+    this.ctx.fillStyle = this.state.fontColor;
     const cursorWidth = 2;
     const cursorHeight = 18;
     this.ctx.fillRect(
@@ -430,9 +430,9 @@ class Terminal {
   }
 
   private setFontStyle() {
-    this.ctx.font = this.state.getFontLoaded() ? this.state.getFont() : this.state.getDefaultFont();
+    this.ctx.font = this.state.fontLoaded ? this.state.getFont() : this.state.getDefaultFont();
     this.ctx.textBaseline = "top";
-    this.ctx.fillStyle = this.state.getFontColor();
+    this.ctx.fillStyle = this.state.fontColor;
   }
 }
 
