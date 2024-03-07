@@ -83,7 +83,7 @@ class Terminal {
 
   private clearTerminal() {
     this.state.textLines = [];
-    this.state.setCurrLinePos(new Point(0, 0));
+    this.state.setCurrLinePos(Point.from(this.state.getNewStartingPos()));
     this.drawNewPromptRow();
     this.render();
   }
@@ -264,7 +264,7 @@ class Terminal {
       return;
     }
     this.renderInProgress = true;
-    this.state.setCurrLinePos(new Point(0, 0));
+    this.state.setCurrLinePos(this.state.getNewStartingPos());
     this.drawBg();
     this.drawTextLines();
     this.renderInProgress = false;
@@ -364,13 +364,12 @@ class Terminal {
     const monospacedCharacter = "a";
     const textMetrics = this.ctx.measureText(monospacedCharacter);
     return textMetrics.fontBoundingBoxAscent +
-      textMetrics.fontBoundingBoxDescent +
-      this.state.textLinePadding;
+      textMetrics.fontBoundingBoxDescent;
   }
 
   private moveToNewline() {
     const currLinePos = this.state.getCurrLinePos();
-    currLinePos.x = 0;
+    currLinePos.x = this.state.getNewStartingPos().x;
     currLinePos.y += this.getLineHeight();
   }
 
@@ -390,7 +389,7 @@ class Terminal {
     pos.y += this.state.cursorPaddingTop;
     this.ctx.fillStyle = this.state.getFontColor();
     const cursorWidth = 2;
-    const cursorHeight = 20;
+    const cursorHeight = 18;
     this.ctx.fillRect(
       pos.x,
       pos.y,
@@ -406,8 +405,8 @@ class Terminal {
       const rowText = textToDraw.substring(0, rowTextLength);
       this.ctx.fillText(
         rowText,
-        this.state.currLinePos.x + this.state.textLinePadding,
-        this.state.currLinePos.y + this.state.textLinePadding);
+        this.state.currLinePos.x,
+        this.state.currLinePos.y);
       const textMetrics = this.ctx.measureText(textToDraw);
       this.state.currLinePos.x += textMetrics.width;
       textToDraw = textToDraw.substring(rowTextLength);
@@ -421,8 +420,8 @@ class Terminal {
     this.setFontStyle();
     this.ctx.fillText(
       this.state.prompt,
-      this.state.currLinePos.x + this.state.textLinePadding,
-      this.state.currLinePos.y + this.state.textLinePadding);
+      this.state.currLinePos.x,
+      this.state.currLinePos.y);
     const textMetrics = this.ctx.measureText(this.state.prompt);
     this.state.currLinePos.x += textMetrics.width;
     this.state.textLines.push(this.state.prompt);
