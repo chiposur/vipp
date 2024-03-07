@@ -83,7 +83,7 @@ class Terminal {
 
   private clearTerminal() {
     this.state.textLines = [];
-    this.state.currLinePos = new Point(0, 0);
+    this.state.setCurrLinePos(new Point(0, 0));
     this.drawNewPromptRow();
     this.render();
   }
@@ -264,7 +264,7 @@ class Terminal {
       return;
     }
     this.renderInProgress = true;
-    this.state.currLinePos = new Point(0, 0);
+    this.state.setCurrLinePos(new Point(0, 0));
     this.drawBg();
     this.drawTextLines();
     this.renderInProgress = false;
@@ -332,11 +332,11 @@ class Terminal {
     let visibleHeight = 0;
     const lineHeight = this.getLineHeight();
     for (let i = visibleEndIndex; i >= 0; i -= 1) {
+      visibleHeight += lineHeight;
       if (visibleHeight > this.canvas.height) {
         visibleStartIndex = i + 1;
         break;
       }
-      visibleHeight += lineHeight;
     }
     return visibleStartIndex;
   }
@@ -369,8 +369,9 @@ class Terminal {
   }
 
   private moveToNewline() {
-    this.state.currLinePos.x = 0;
-    this.state.currLinePos.y += this.getLineHeight();
+    const currLinePos = this.state.getCurrLinePos();
+    currLinePos.x = 0;
+    currLinePos.y += this.getLineHeight();
   }
 
   private animateCursor() {
