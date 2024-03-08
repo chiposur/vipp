@@ -130,7 +130,7 @@ class TerminalCommands {
   }
 
   private vipp(args: Array<string>): CommandResult {
-    console.log(`vipp called with ${args.length} args`);
+    console.debug(`vipp called with ${args.length} args`);
     return {
       ExitStatus: 1,
       Output: ['vipp not implemented']
@@ -138,7 +138,7 @@ class TerminalCommands {
   }
 
   private touch(args: Array<string>): CommandResult {
-    console.log(`touch called with ${args.length} args`);
+    console.debug(`touch called with ${args.length} args`);
     if (args.length === 0) {
       return {
         ExitStatus: 1,
@@ -165,7 +165,7 @@ class TerminalCommands {
   }
 
   private ls(args: Array<string>): CommandResult {
-    console.log(`ls called with ${args.length} args`);
+    console.debug(`ls called with ${args.length} args`);
     const dir = this.terminalState.currDir;
     if (dir.children.length === 0 && dir.files.length === 0) {
       return {
@@ -183,7 +183,7 @@ class TerminalCommands {
   }
 
   private cd(args: Array<string>): CommandResult {
-    console.log(`cd called with ${args.length} args`);
+    console.debug(`cd called with ${args.length} args`);
     if (args.length === 0) {
       return {
         ExitStatus: 1,
@@ -208,7 +208,7 @@ class TerminalCommands {
   }
 
   private mkdir(args: Array<string>): CommandResult {
-    console.log(`mkdir called with ${args.length} args`);
+    console.debug(`mkdir called with ${args.length} args`);
     if (args.length === 0) {
       return {
         ExitStatus: 1,
@@ -234,7 +234,7 @@ class TerminalCommands {
   }
 
   private rm(args: Array<string>): CommandResult {
-    console.log(`rm called with ${args.length} args`);
+    console.debug(`rm called with ${args.length} args`);
     if (args.length === 0) {
       return {
         ExitStatus: 1,
@@ -269,7 +269,7 @@ class TerminalCommands {
   }
 
   private pwd(args: Array<string>): CommandResult {
-    console.log(`pwd called with ${args.length} args`);
+    console.debug(`pwd called with ${args.length} args`);
     return {
       ExitStatus: 0,
       Output: [this.terminalState.currDir.getFullName()],
@@ -277,7 +277,7 @@ class TerminalCommands {
   }
 
   private cat(args: Array<string>): CommandResult {
-    console.log(`cat called with ${args.length} args`);
+    console.debug(`cat called with ${args.length} args`);
     if (args.length === 0) {
       return {
         ExitStatus: 1,
