@@ -167,7 +167,8 @@ class Terminal {
         return nextIndex;
       }
       const nextChar = line[index - 1];
-      if (nextChar === ' ') {
+      const currChar = line[index];
+      if (nextChar === ' ' && currChar !== ' ') {
         return index;
       }
       index += incrementor;
