@@ -138,13 +138,13 @@ class Terminal {
     this.moveToNewline();
     const currLineCmd = this.state.currTextLineCmd;
     if (currLineCmd) {
-      const parsedCommand: string[] = currLineCmd.split(" ");
-      const args = parsedCommand.length > 0 ? parsedCommand.slice(1) : [];
-      const cmdResult = this.commands.processCommand(parsedCommand[0], args);
-      if (cmdResult.Output) {
-        cmdResult.Output.forEach((l) => this.state.textLines.push(l));
-      }
-      this.moveToNewline();
+      const commandResults = this.commands.processCommands(currLineCmd);
+      commandResults.forEach((r) => {
+        if (r.Output) {
+          r.Output.forEach((l) => this.state.textLines.push(l));
+        }
+        this.moveToNewline();
+      });
     }
     this.drawNewPromptRow();
     this.render();

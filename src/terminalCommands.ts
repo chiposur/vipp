@@ -1,3 +1,4 @@
+import { CommandParser, ParsedCommand } from './commandParser'
 import { FileSystem, File, Folder } from './fileSystem'
 import { Storage } from './storage'
 import { TerminalState } from './terminalState'
@@ -75,17 +76,26 @@ class TerminalCommands {
     this.cycledCommandIndex = -1;
   }
 
-  public processCommand(command: string, args?: Array<string>): CommandResult {
+  public processCommands(commands: string): Array<CommandResult> {
     this.cycledCommandIndex = -1;
-    const argsText = args ? ` ${args.join(' ')}` : '';
-    this.commandHistory.push(`${command}${argsText}`)
-    if (this.commandMap.has(command)) {
-      const terminalCommand: TerminalCommand = this.commandMap.get(command);
-      return terminalCommand.run(args || []);
+    this.commandHistory.push(commands);
+    const parsedCommands = CommandParser.parseCommands(commands);
+    const output: Array<CommandResult> = [];
+    parsedCommands.forEach((c) => {
+      const commandResult = this.processCommand(c);
+      output.push(commandResult);
+    });
+    return output;
+  }
+
+  private processCommand(parsedCommand: ParsedCommand) {
+    if (this.commandMap.has(parsedCommand.command)) {
+      const terminalCommand: TerminalCommand = this.commandMap.get(parsedCommand.command);
+      return terminalCommand.run(parsedCommand.args || []);
     }
     return {
       ExitStatus: 1,
-      Output: [`${command}: command not found`]
+      Output: [`${parsedCommand.command}: command not found`]
     };
   }
 
