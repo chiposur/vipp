@@ -72,6 +72,12 @@ class TerminalCommands {
         name: 'cat',
         run: (args?: Array<string>): CommandResult => { return this.cat(args || []) }
       });
+    this.commandMap.set(
+      'echo',
+      {
+        name: 'echo',
+        run: (args?: Array<string>): CommandResult => { return this.echo(args || []) }
+      });
     this.commandHistory = [];
     this.cycledCommandIndex = -1;
   }
@@ -306,6 +312,15 @@ class TerminalCommands {
     return {
       ExitStatus: 0,
       Output: file.text.split('\n'),
+    }
+  }
+
+  private echo(args: Array<string>): CommandResult {
+    console.debug(`echo called with ${args.length} args`);
+    const echoText = args.join(' ');
+    return {
+      ExitStatus: 0,
+      Output: echoText.length > 0 ? echoText.split('\n') : [],
     }
   }
 }
