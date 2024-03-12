@@ -14,6 +14,7 @@ Vim-like browser based text editor. Currently in active development with limited
 | **rm**    | Remove file or directory                                    |
 | **pwd**   | Output current working directory                            |
 | **cat**   | Output file text                                            |
+| **echo**  | Output strings passed in as arguments                       |
 
 ## Available terminal shortcuts
 
