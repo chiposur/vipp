@@ -6,7 +6,7 @@ class NLevelChild {
 }
 
 class Storage {
-  static rootKey: string = "FILE_SYSTEM_ROOT";
+  static rootKey: string = 'FILE_SYSTEM_ROOT';
 
   static saveFileSystem(root: Folder) {
     const serializedFolder = this.serializeFolder(root);
@@ -38,7 +38,7 @@ class Storage {
     if (text) {
       return text;
     }
-    return "";
+    return '';
   }
 
   static serializeFolder(folder: Folder): string {
@@ -54,7 +54,7 @@ class Storage {
       } catch (error) {
         console.warn(
           `Could not parse file system in local storage key "${this.rootKey}"`);
-        console.log("Defaulting to empty file system...");
+        console.log('Defaulting to empty file system...');
       }
     }
     return null;
@@ -77,7 +77,7 @@ class Storage {
         const newFolder = new Folder(name);
         newFolder.setParent(c.parentFolder);
         if (nameMap.has(newFolder.getFullName())) {
-          console.warn("Duplicate folder path detected; skipping...");
+          console.warn('Duplicate folder path detected; skipping...');
           return;
         }
         nameMap.set(newFolder.getFullName(), true);
@@ -99,11 +99,11 @@ class Storage {
     const nameMap = new Map<string, boolean>();
     serializedFiles.forEach((f) => {
       if (nameMap.has(f.name)) {
-        console.warn("Duplicate file path detected; skipping...");
+        console.warn('Duplicate file path detected; skipping...');
         return;
       }
       nameMap.set(f.name, true);
-      const file = new File(f.name, "");
+      const file = new File(f.name, '');
       file.setParent(folder);
       folder.addFile(file);
       const text = window.localStorage.getItem(file.getAbsolutePath());

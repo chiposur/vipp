@@ -16,6 +16,14 @@ Vim-like browser based text editor. Currently in active development with limited
 | **cat**   | Output file text                                            |
 | **echo**  | Output strings passed in as arguments                       |
 
+## Available terminal operators
+
+| Operator  | Description                                                 |
+|----------:| ------------------------------------------------------------|
+| **\|**    | Pipe output to next command                                 |
+| **>**     | Redirect output to overwite file                            |
+| **>>**    | Redirect output to append to file                           |
+
 ## Available terminal shortcuts
 
 | Shortcut         | Description                                          |

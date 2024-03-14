@@ -43,7 +43,7 @@ class Terminal {
   }
 
   private loadFont() {
-    const fontFilename = "roboto.ttf";
+    const fontFilename = 'roboto.ttf';
     const font = new FontFace(this.state.fontName, `url(${fontFilename})`);
     font.load().then(() => {
       this.state.fontLoaded = true;
@@ -61,24 +61,24 @@ class Terminal {
   }
 
   private loadFiles() {
-    if (this.state.currDir.containsFile("readme")) {
+    if (this.state.currDir.containsFile('readme')) {
       // ~/readme is special file that should not be overwriteable
-      this.state.currDir.files = this.state.currDir.files.filter((f) => f.name !== "readme");
+      this.state.currDir.files = this.state.currDir.files.filter((f) => f.name !== 'readme');
     }
     const readmeText = `
       Vipp Editor
       © ${new Date().getFullYear()} Chip Osur
       Usage: https://github.com/chiposur/vipp
     `;
-    const readme = new File("readme", readmeText);
+    const readme = new File('readme', readmeText);
     const root = this.fileSystem.root;
     root.addFile(readme);
     this.readme = readme;
   }
 
   private registerHandlers() {
-    const eventTarget = document.getElementById("terminal");
-    eventTarget.addEventListener("keydown", (e: KeyboardEvent) => this.onKeyDown(e));
+    const eventTarget = document.getElementById('terminal');
+    eventTarget.addEventListener('keydown', (e: KeyboardEvent) => this.onKeyDown(e));
   }
 
   private clearTerminal() {
@@ -89,7 +89,7 @@ class Terminal {
   }
 
   private clearCurrentLine() {
-    this.state.setCurrTextLineCmd("");
+    this.state.setCurrTextLineCmd('');
     this.render();
   }
 
@@ -105,7 +105,7 @@ class Terminal {
   }
 
   private getMaxCharactersPerRow(): number {
-    const monospacedCharacter = "a";
+    const monospacedCharacter = 'a';
     const textMetrics = this.ctx.measureText(monospacedCharacter);
     return Math.floor(this.canvas.width / textMetrics.width);
   }
@@ -201,43 +201,43 @@ class Terminal {
   }
 
   private onKeyDown(e: KeyboardEvent) {
-    if (e.ctrlKey && e.key === "k") {
+    if (e.ctrlKey && e.key === 'k') {
       this.clearTerminal();
       e.preventDefault();
       return;
     }
-    if (e.ctrlKey && e.key === "u") {
+    if (e.ctrlKey && e.key === 'u') {
       this.clearCurrentLine();
       e.preventDefault();
       return;
     }
-    if (e.ctrlKey && e.key === "ArrowLeft") {
+    if (e.ctrlKey && e.key === 'ArrowLeft') {
       this.handleTraverseWord(true);
       e.preventDefault();
       return;
     }
-    if (e.ctrlKey && e.key === "ArrowRight") {
+    if (e.ctrlKey && e.key === 'ArrowRight') {
       this.handleTraverseWord(false);
       e.preventDefault();
       return;
     }
     switch (e.key) {
-      case "Enter":
+      case 'Enter':
         this.handleEnter();
         break;
-      case "Backspace":
+      case 'Backspace':
         this.handleBackspace();
         break;
-      case "ArrowUp":
+      case 'ArrowUp':
         this.handleCycleHistory(true);
         break;
-      case "ArrowDown":
+      case 'ArrowDown':
         this.handleCycleHistory(false);
         break;
-      case "ArrowLeft":
+      case 'ArrowLeft':
         this.handleTraverseCharacter(true);
         break;
-      case "ArrowRight":
+      case 'ArrowRight':
         this.handleTraverseCharacter(false);
         break;
       default:
@@ -274,17 +274,17 @@ class Terminal {
   private detectUnsupportedUserAgent(): boolean {
     const userAgent: string = window.navigator.userAgent;
     switch (userAgent) {
-      case "/Android/i":
+      case '/Android/i':
         return true;
-      case "/BlackBerry/i":
+      case '/BlackBerry/i':
         return true;
-      case "/iPhone/i":
+      case '/iPhone/i':
         return true;
-      case "/iPad/i":
+      case '/iPad/i':
         return true;
-      case "/Opera Mini/i":
+      case '/Opera Mini/i':
         return true;
-      case "/IEMobile/i":
+      case '/IEMobile/i':
         return true;
       default:
         return false;
@@ -307,12 +307,12 @@ class Terminal {
   }
 
   private drawFontsLoadingFrame() {
-    const text = "Fonts loading...";
+    const text = 'Fonts loading...';
     this.drawCenteredMessageFrame(text);
   }
 
   private drawUnsupportedFrame() {
-    const text = "Mobile browsers are unsupported.";
+    const text = 'Mobile browsers are unsupported.';
     this.drawCenteredMessageFrame(text);
   }
 
@@ -362,7 +362,7 @@ class Terminal {
   }
 
   private getLineHeight() {
-    const monospacedCharacter = "a";
+    const monospacedCharacter = 'a';
     const textMetrics = this.ctx.measureText(monospacedCharacter);
     return textMetrics.fontBoundingBoxAscent +
       textMetrics.fontBoundingBoxDescent;
@@ -426,13 +426,13 @@ class Terminal {
     const textMetrics = this.ctx.measureText(this.state.prompt);
     this.state.currLinePos.x += textMetrics.width;
     this.state.textLines.push(this.state.prompt);
-    this.state.setCurrTextLineCmd("");
+    this.state.setCurrTextLineCmd('');
     this.state.setCursorIndex(0);
   }
 
   private setFontStyle() {
     this.ctx.font = this.state.fontLoaded ? this.state.getFont() : this.state.getDefaultFont();
-    this.ctx.textBaseline = "top";
+    this.ctx.textBaseline = 'top';
     this.ctx.fillStyle = this.state.fontColor;
   }
 }

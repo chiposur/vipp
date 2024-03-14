@@ -26,17 +26,17 @@ class TerminalState {
     this.currLinePos = Point.from(this.startingPos);
     this.cursorPos = Point.from(this.startingPos);
     this.cursorIndex = 0;
-    this.currTextLineCmd = ""
-    this.fontName = "Roboto Mono";
-    this.fontSize = "16px";
-    this.fontColor = "white";
+    this.currTextLineCmd = '';
+    this.fontName = 'Roboto Mono';
+    this.fontSize = '16px';
+    this.fontColor = 'white';
     this.fontLoaded = false;
-    this.bgColor = "black";
+    this.bgColor = 'black';
     this.textLines = [];
-    this.currTextLineCmd = ""
+    this.currTextLineCmd = '';
     this.cursorPaddingLeft = 0;
     this.cursorPaddingTop = -2;
-    this.prompt = "";
+    this.prompt = '';
   }
 
   public getDefaultFont(): string {
@@ -53,7 +53,7 @@ class TerminalState {
   }
 
   public getPwd(): string {
-    return this.currDir?.getFullName() || "";
+    return this.currDir?.getFullName() || '';
   }
 
   public setCursorIndex(index: number) {

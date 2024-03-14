@@ -7,7 +7,7 @@ class FileSystem {
   root: Folder
 
   public constructor() {
-    this.root = new Folder("~");
+    this.root = new Folder('~');
   }
 
   public isValidFoldername(name: string): boolean {
@@ -39,7 +39,7 @@ class FileSystem {
   }
 
   private isReservedFoldername(name: string) {
-    return name === "." || name === ".." || name === "~";
+    return name === '.' || name === '..' || name === '~';
   }
 
   public resolveFolder(curr: Folder, path: string): FolderResult {
@@ -75,11 +75,11 @@ class FileSystem {
   }
 
   private updateCurrentFolderFromReservedName(curr: Folder, reservedFoldername: string): Folder {
-    if (reservedFoldername === "..") {
+    if (reservedFoldername === '..') {
       if (curr.parent) {
         curr = curr.parent;
       }
-    } else if (reservedFoldername === "~") {
+    } else if (reservedFoldername === '~') {
       curr = this.root;
     }
     return curr;

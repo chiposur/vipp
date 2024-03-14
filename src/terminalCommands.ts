@@ -1,11 +1,11 @@
-import { CommandParser, ParsedCommand } from './commandParser'
+import { CommandParser, TokenizedCommand } from './commandParser'
 import { FileSystem, File, Folder } from './fileSystem'
 import { Storage } from './storage'
 import { TerminalState } from './terminalState'
 
 class TerminalCommand {
   name: string
-  run: (args?: Array<string>) => CommandResult
+  run: (input?: string, args?: Array<string>) => CommandResult
 }
 
 class CommandResult {
@@ -28,55 +28,55 @@ class TerminalCommands {
       'vipp',
       {
         name: 'vipp',
-        run: (args?: Array<string>): CommandResult => { return this.vipp(args || []) }
+        run: (_input?: string, args?: Array<string>): CommandResult => { return this.vipp(args || []) }
       });
     this.commandMap.set(
       'touch',
       {
         name: 'touch',
-        run: (args?: Array<string>): CommandResult => { return this.touch(args || []) }
+        run: (_input?: string, args?: Array<string>): CommandResult => { return this.touch(args || []) }
       });
     this.commandMap.set(
       'ls',
       {
         name: 'ls',
-        run: (args?: Array<string>): CommandResult => { return this.ls(args || []) }
+        run: (_input?: string, args?: Array<string>): CommandResult => { return this.ls(args || []) }
       });
     this.commandMap.set(
       'cd',
       {
         name: 'cd',
-        run: (args?: Array<string>): CommandResult => { return this.cd(args || []) }
+        run: (_input?: string, args?: Array<string>): CommandResult => { return this.cd(args || []) }
       });
     this.commandMap.set(
       'mkdir',
       {
         name: 'mkdir',
-        run: (args?: Array<string>): CommandResult => { return this.mkdir(args || []) }
+        run: (_input?: string, args?: Array<string>): CommandResult => { return this.mkdir(args || []) }
       });
     this.commandMap.set(
       'rm',
       {
         name: 'rm',
-        run: (args?: Array<string>): CommandResult => { return this.rm(args || []) }
+        run: (_input?: string, args?: Array<string>): CommandResult => { return this.rm(args || []) }
       });
     this.commandMap.set(
       'pwd',
       {
         name: 'pwd',
-        run: (args?: Array<string>): CommandResult => { return this.pwd(args || []) }
+        run: (_input?: string, args?: Array<string>): CommandResult => { return this.pwd(args || []) }
       });
     this.commandMap.set(
       'cat',
       {
         name: 'cat',
-        run: (args?: Array<string>): CommandResult => { return this.cat(args || []) }
+        run: (_input?: string, args?: Array<string>): CommandResult => { return this.cat(args || []) }
       });
     this.commandMap.set(
       'echo',
       {
         name: 'echo',
-        run: (args?: Array<string>): CommandResult => { return this.echo(args || []) }
+        run: (input?: string, args?: Array<string>): CommandResult => { return this.echo(input || '', args || []) }
       });
     this.commandHistory = [];
     this.cycledCommandIndex = -1;
@@ -85,24 +85,96 @@ class TerminalCommands {
   public processCommands(commands: string): Array<CommandResult> {
     this.cycledCommandIndex = -1;
     this.commandHistory.push(commands);
-    const parsedCommands = CommandParser.parseCommands(commands);
+    const tokenizedCommands = CommandParser.parseCommands(commands);
     const output: Array<CommandResult> = [];
-    parsedCommands.forEach((c) => {
+    tokenizedCommands.forEach((c) => {
       const commandResult = this.processCommand(c);
       output.push(commandResult);
     });
     return output;
   }
 
-  private processCommand(parsedCommand: ParsedCommand) {
-    if (this.commandMap.has(parsedCommand.command)) {
-      const terminalCommand: TerminalCommand = this.commandMap.get(parsedCommand.command);
-      return terminalCommand.run(parsedCommand.args || []);
+  private processCommand(tokenizedCommand: TokenizedCommand): CommandResult {
+    let curr = tokenizedCommand;
+    let nextInput = '';
+    let commandResult;
+    while (curr) {
+      if (!curr) {
+        return commandResult;
+      }
+      if (curr.isOperator) {
+        this.handleOperator(nextInput, curr);
+      } else if (this.commandMap.has(curr.command)) {
+        const terminalCommand: TerminalCommand = this.commandMap.get(curr.command);
+        commandResult = terminalCommand.run(nextInput, curr.args || []);
+        nextInput = commandResult.Output.join('\n');
+      } else {
+        return {
+          ExitStatus: 1,
+          Output: [`${curr.command}: command not found`]
+        };
+      }
+      curr = curr.next;
     }
-    return {
-      ExitStatus: 1,
-      Output: [`${parsedCommand.command}: command not found`]
-    };
+    return commandResult;
+  }
+
+  private handleOperator(input: string, tokenizedCommand: TokenizedCommand) {
+    const operator = tokenizedCommand.command;
+    const args = tokenizedCommand.args;
+    const firstArg = args.length > 0 ? args[0] : '';
+    switch (operator) {
+      case '|':
+        break;
+      case '>':
+        this.writeToFile(input, firstArg);
+        break;
+      case '>>':
+        this.appendToFile(input, firstArg);
+        break;
+      default:
+        console.debug(`Operator '${operator}' not found`);
+    }
+  }
+
+  private writeToFile(input: string, filename: string) {
+    if (!filename) {
+      return;
+    }
+    let dir = this.terminalState.currDir;
+    const folderParts = filename.split('/');
+    if (folderParts.length > 1) {
+      const folderResult = this.fileSystem.resolveFolder(dir, folderParts.slice(1).join(''));
+      if (folderResult.exists) {
+        dir = folderResult.folder;
+      } else {
+        return;
+      }
+    }
+    const file = dir.getFile(filename);
+    if (file) {
+      file.text = input;
+    }
+  }
+
+  private appendToFile(input: string, filename: string) {
+    if (!filename) {
+      return;
+    }
+    let dir = this.terminalState.currDir;
+    const folderParts = filename.split('/');
+    if (folderParts.length > 1) {
+      const folderResult = this.fileSystem.resolveFolder(dir, folderParts.slice(1).join(''));
+      if (folderResult.exists) {
+        dir = folderResult.folder;
+      } else {
+        return;
+      }
+    }
+    const file = dir.getFile(filename);
+    if (file) {
+      file.text = `${file.text}${input}`;
+    }
   }
 
   // cycleCommand returns a command forwards or backwards in history
@@ -189,8 +261,8 @@ class TerminalCommands {
         Output: [],
       };
     }
-    const folders = `${dir.children.map((f) => `${f.name}/`).join(" ")}`;
-    const files = `${dir.files.map((f) => f.name).join(" ")}`;
+    const folders = `${dir.children.map((f) => `${f.name}/`).join(' ')}`;
+    const files = `${dir.files.map((f) => f.name).join(' ')}`;
     const filesAndFolders = `${folders} ${files}`;
     return {
       ExitStatus: 0,
@@ -203,7 +275,7 @@ class TerminalCommands {
     if (args.length === 0) {
       return {
         ExitStatus: 1,
-        Output: ["usage: cd [folder path]"],
+        Output: ['usage: cd [folder path]'],
       };
     }
     const dir = this.terminalState.currDir;
@@ -228,7 +300,7 @@ class TerminalCommands {
     if (args.length === 0) {
       return {
         ExitStatus: 1,
-        Output: ["usage: mkdir [folder]"]
+        Output: ['usage: mkdir [folder]']
       };
     }
     const name = args[0];
@@ -254,7 +326,7 @@ class TerminalCommands {
     if (args.length === 0) {
       return {
         ExitStatus: 1,
-        Output: ["usage: rm [file|folder]"]
+        Output: ['usage: rm [file|folder]'],
       };
     }
     const name = args[0];
@@ -265,7 +337,7 @@ class TerminalCommands {
     if (!containsName) {
       return {
         ExitStatus: 1,
-        Output: [`"${name}" does not exist in current directory`]
+        Output: [`"${name}" does not exist in current directory`],
       };
     }
     if (containsFile) {
@@ -297,7 +369,7 @@ class TerminalCommands {
     if (args.length === 0) {
       return {
         ExitStatus: 1,
-        Output: ["usage: cat [file]"],
+        Output: ['usage: cat [file]'],
       };
     }
     const name = args[0];
@@ -306,7 +378,7 @@ class TerminalCommands {
     if (!file) {
       return {
         ExitStatus: 1,
-        Output: [`file "${name}" does not exist in current directory`]
+        Output: [`file "${name}" does not exist in current directory`],
       };
     }
     return {
@@ -315,9 +387,9 @@ class TerminalCommands {
     }
   }
 
-  private echo(args: Array<string>): CommandResult {
+  private echo(input: string, args: Array<string>): CommandResult {
     console.debug(`echo called with ${args.length} args`);
-    const echoText = args.join(' ');
+    const echoText = `${input}${args.join(' ')}`;
     return {
       ExitStatus: 0,
       Output: echoText.length > 0 ? echoText.split('\n') : [],
