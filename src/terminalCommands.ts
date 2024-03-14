@@ -103,7 +103,7 @@ class TerminalCommands {
         return commandResult;
       }
       if (curr.isOperator) {
-        this.handleOperator(nextInput, curr);
+        commandResult = this.handleOperator(nextInput, curr);
       } else if (this.commandMap.has(curr.command)) {
         const terminalCommand: TerminalCommand = this.commandMap.get(curr.command);
         commandResult = terminalCommand.run(nextInput, curr.args || []);
@@ -119,7 +119,9 @@ class TerminalCommands {
     return commandResult;
   }
 
-  private handleOperator(input: string, tokenizedCommand: TokenizedCommand) {
+  private handleOperator(input: string, tokenizedCommand: TokenizedCommand): CommandResult {
+    let output = input;
+    let exitStatus = 0;
     const operator = tokenizedCommand.command;
     const args = tokenizedCommand.args;
     const firstArg = args.length > 0 ? args[0] : '';
@@ -127,14 +129,21 @@ class TerminalCommands {
       case '|':
         break;
       case '>':
+        output = '';
         this.writeToFile(input, firstArg);
         break;
       case '>>':
+        output = '';
         this.appendToFile(input, firstArg);
         break;
       default:
+        exitStatus = 1;
         console.debug(`Operator '${operator}' not found`);
     }
+    return {
+      Output: output ? [output] : [],
+      ExitStatus: exitStatus,
+    };
   }
 
   private writeToFile(input: string, filename: string) {
