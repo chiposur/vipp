@@ -163,6 +163,7 @@ class TerminalCommands {
     const file = dir.getFile(filename);
     if (file) {
       file.text = input;
+      Storage.saveFileText(file);
     }
   }
 
@@ -183,6 +184,7 @@ class TerminalCommands {
     const file = dir.getFile(filename);
     if (file) {
       file.text = `${file.text}${input}`;
+      Storage.saveFileText(file);
     }
   }
 
