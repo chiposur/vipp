@@ -30,5 +30,7 @@ module.exports = {
         "@typescript-eslint"
     ],
     "rules": {
+        "eol-last": ["error", "always"],
+        "no-multiple-empty-lines": ["error", { max: 1, maxEOF: 1 }]
     }
 }
