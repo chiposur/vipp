@@ -104,7 +104,6 @@ class Storage {
       }
       nameMap.set(f.name, true);
       const file = new File(f.name, '');
-      file.setParent(folder);
       folder.addFile(file);
       const text = window.localStorage.getItem(file.getAbsolutePath());
       if (text) {

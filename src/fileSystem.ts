@@ -211,6 +211,7 @@ class Folder {
   }
 
   public addFile(file: File) {
+    file.setParent(this);
     this.files.push(file);
   }
 

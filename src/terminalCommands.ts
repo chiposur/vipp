@@ -253,7 +253,6 @@ class TerminalCommands {
       };
     }
     const file = new File(name, '');
-    file.setParent(dir);
     dir.addFile(file);
     Storage.saveFileText(file);
     Storage.saveFileSystem(this.fileSystem.root);
