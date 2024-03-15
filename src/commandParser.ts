@@ -49,7 +49,8 @@ class CommandParser {
             index: i+1,
           }
         }
-      } else if (isWriteFile) {
+      }
+      if (isWriteFile) {
         return {
           operator: '>',
           index: i,
