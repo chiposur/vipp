@@ -66,9 +66,9 @@ class CommandParser {
     const commandChains: Array<string> = commands.split(';');
     const parsedCommands: Array<TokenizedCommand> = [];
     commandChains.forEach((c) => {
-      const chainedCommand = this.parseCommandChain(c);
-      if (chainedCommand.isValid()) {
-        parsedCommands.push(chainedCommand);
+      const tokenChain = this.parseCommandChain(c);
+      if (tokenChain.isValid()) {
+        parsedCommands.push(tokenChain);
       }
     });
     return parsedCommands;
