@@ -30,6 +30,7 @@ Vim-like browser based text editor. Currently in active development with limited
 |-----------------:| -----------------------------------------------------|
 | **Ctrl** + **k** | Clear terminal                                       |
 | **Ctrl** + **u** | Clear current line (entire line, not from cursor)    |
+| **Ctrl** + **v** | Paste clipboard text                                 |
 | **Ctrl** + **←** | Shift cursor one word left                           |
 | **Ctrl** + **→** | Shift cursor one word right                          |
 | **↑**            | History search backward                              |
