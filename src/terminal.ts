@@ -200,6 +200,29 @@ class Terminal {
     this.state.cursorPos = new Point(translatedX, translatedY);
   }
 
+  private readPasteTextComplete(pasteText: string) {
+    const currCmd = this.state.currTextLineCmd;
+    let newCmd;
+    if (this.state.cursorIndex > currCmd.length - 1) {
+      newCmd = `${currCmd}${pasteText}`;
+    } else {
+      newCmd = currCmd.split('').map((val, index) => {
+        if (index === this.state.cursorIndex) {
+          return `${pasteText}${val}`;
+        }
+        return val;
+      }).join('');
+    }
+    this.state.setCurrTextLineCmd(newCmd);
+    const newCursorIndex = this.state.cursorIndex + pasteText.length;
+    this.state.setCursorIndex(newCursorIndex);
+    this.render();
+  }
+
+  private handlePaste() {
+    navigator.clipboard.readText().then((pasteText) => this.readPasteTextComplete(pasteText));
+  }
+
   private onKeyDown(e: KeyboardEvent) {
     if (e.ctrlKey && e.key === 'k') {
       this.clearTerminal();
@@ -218,6 +241,11 @@ class Terminal {
     }
     if (e.ctrlKey && e.key === 'ArrowRight') {
       this.handleTraverseWord(false);
+      e.preventDefault();
+      return;
+    }
+    if (e.ctrlKey && e.key === 'v') {
+      this.handlePaste();
       e.preventDefault();
       return;
     }
