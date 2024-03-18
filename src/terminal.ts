@@ -14,7 +14,6 @@ class Terminal {
   private cursorInterval: number
   private cursorVisible: boolean
   private renderInProgress: boolean
-  private readme: File
 
   public constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
     this.canvas = canvas;
@@ -33,10 +32,9 @@ class Terminal {
     this.state.setCurrDir(this.fileSystem.root);
     this.commands = new TerminalCommands(this.fileSystem, this.state);
     this.loadFont();
-    this.loadFiles();
     this.registerHandlers();
     this.syncCanvasResolution();
-    this.addReadmeToTextLines();
+    this.addAndShowReadme();
     this.drawNewPromptRow();
     this.render();
     this.cursorInterval = window.setInterval(() => this.animateCursor(), 800);
@@ -51,16 +49,7 @@ class Terminal {
     });
   }
 
-  private addReadmeToTextLines() {
-    if (!this.readme) {
-      return;
-    }
-    this.readme.text.split('\n').forEach((line) => {
-      this.state.textLines.push(line);
-    });
-  }
-
-  private loadFiles() {
+  private addAndShowReadme() {
     if (this.state.currDir.containsFile('readme')) {
       // ~/readme is special file that should not be overwriteable
       this.state.currDir.files = this.state.currDir.files.filter((f) => f.name !== 'readme');
@@ -73,7 +62,9 @@ class Terminal {
     const readme = new File('readme', readmeText);
     const root = this.fileSystem.root;
     root.addFile(readme);
-    this.readme = readme;
+    readme.text.split('\n').forEach((line) => {
+      this.state.textLines.push(line);
+    });
   }
 
   private registerHandlers() {
