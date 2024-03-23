@@ -131,8 +131,8 @@ class Terminal {
     if (currLineCmd) {
       const commandResults = this.commands.processCommands(currLineCmd);
       commandResults.forEach((r) => {
-        if (r.Output) {
-          r.Output.forEach((l) => this.state.textLines.push(l));
+        if (r.output) {
+          r.output.forEach((l) => this.state.textLines.push(l));
         }
         this.moveToNewline();
       });

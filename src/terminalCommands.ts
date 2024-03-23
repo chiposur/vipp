@@ -9,8 +9,8 @@ class TerminalCommand {
 }
 
 class CommandResult {
-  ExitStatus: number
-  Output: Array<string>
+  exitStatus: number
+  output: Array<string>
 }
 
 class TerminalCommands {
@@ -107,11 +107,11 @@ class TerminalCommands {
       } else if (this.commandMap.has(curr.command)) {
         const terminalCommand: TerminalCommand = this.commandMap.get(curr.command);
         commandResult = terminalCommand.run(nextInput, curr.args || []);
-        nextInput = commandResult.Output.join('\n');
+        nextInput = commandResult.output.join('\n');
       } else {
         return {
-          ExitStatus: 1,
-          Output: [`${curr.command}: command not found`]
+          exitStatus: 1,
+          output: [`${curr.command}: command not found`]
         };
       }
       curr = curr.next;
@@ -141,8 +141,8 @@ class TerminalCommands {
         console.debug(`Operator '${operator}' not found`);
     }
     return {
-      Output: output ? [output] : [],
-      ExitStatus: exitStatus,
+      output: output ? [output] : [],
+      exitStatus: exitStatus,
     };
   }
 
@@ -231,8 +231,8 @@ class TerminalCommands {
   private vipp(args: Array<string>): CommandResult {
     console.debug(`vipp called with ${args.length} args`);
     return {
-      ExitStatus: 1,
-      Output: ['vipp not implemented']
+      exitStatus: 1,
+      output: ['vipp not implemented']
     };
   }
 
@@ -240,16 +240,16 @@ class TerminalCommands {
     console.debug(`touch called with ${args.length} args`);
     if (args.length === 0) {
       return {
-        ExitStatus: 1,
-        Output: ['usage: touch [file]']
+        exitStatus: 1,
+        output: ['usage: touch [file]']
       };
     }
     const name = args[0];
     const dir = this.terminalState.currDir;
     if (dir.containsFile(name) || dir.containsFolder(name)) {
       return {
-        ExitStatus: 1,
-        Output: [`"${name}" already exists in current directory`],
+        exitStatus: 1,
+        output: [`"${name}" already exists in current directory`],
       };
     }
     const file = new File(name, '');
@@ -257,8 +257,8 @@ class TerminalCommands {
     Storage.saveFileText(file);
     Storage.saveFileSystem(this.fileSystem.root);
     return {
-      ExitStatus: 0,
-      Output: [],
+      exitStatus: 0,
+      output: [],
     };
   }
 
@@ -267,16 +267,16 @@ class TerminalCommands {
     const dir = this.terminalState.currDir;
     if (dir.children.length === 0 && dir.files.length === 0) {
       return {
-        ExitStatus: 0,
-        Output: [],
+        exitStatus: 0,
+        output: [],
       };
     }
     const folders = `${dir.children.map((f) => `${f.name}/`).join(' ')}`;
     const files = `${dir.files.map((f) => f.name).join(' ')}`;
     const filesAndFolders = `${folders} ${files}`;
     return {
-      ExitStatus: 0,
-      Output: [filesAndFolders],
+      exitStatus: 0,
+      output: [filesAndFolders],
     };
   }
 
@@ -284,8 +284,8 @@ class TerminalCommands {
     console.debug(`cd called with ${args.length} args`);
     if (args.length === 0) {
       return {
-        ExitStatus: 1,
-        Output: ['usage: cd [folder path]'],
+        exitStatus: 1,
+        output: ['usage: cd [folder path]'],
       };
     }
     const dir = this.terminalState.currDir;
@@ -295,13 +295,13 @@ class TerminalCommands {
     {
       this.terminalState.setCurrDir(result.folder);
       return {
-        ExitStatus: 0,
-        Output: [],
+        exitStatus: 0,
+        output: [],
       };
     }
     return {
-      ExitStatus: 1,
-      Output: [`folder path "${path}" does not exist`],
+      exitStatus: 1,
+      output: [`folder path "${path}" does not exist`],
     };
   }
 
@@ -309,16 +309,16 @@ class TerminalCommands {
     console.debug(`mkdir called with ${args.length} args`);
     if (args.length === 0) {
       return {
-        ExitStatus: 1,
-        Output: ['usage: mkdir [folder]']
+        exitStatus: 1,
+        output: ['usage: mkdir [folder]']
       };
     }
     const name = args[0];
     const dir = this.terminalState.currDir;
     if (dir.containsFolder(name) || dir.containsFile(name)) {
       return {
-        ExitStatus: 1,
-        Output: [`"${name}" already exists in current directory`],
+        exitStatus: 1,
+        output: [`"${name}" already exists in current directory`],
       };
     }
     const folder = new Folder(name);
@@ -326,8 +326,8 @@ class TerminalCommands {
     dir.addChildFolder(folder);
     Storage.saveFileSystem(this.fileSystem.root);
     return {
-      ExitStatus: 0,
-      Output: [],
+      exitStatus: 0,
+      output: [],
     };
   }
 
@@ -335,8 +335,8 @@ class TerminalCommands {
     console.debug(`rm called with ${args.length} args`);
     if (args.length === 0) {
       return {
-        ExitStatus: 1,
-        Output: ['usage: rm [file|folder]'],
+        exitStatus: 1,
+        output: ['usage: rm [file|folder]'],
       };
     }
     const name = args[0];
@@ -346,8 +346,8 @@ class TerminalCommands {
     const containsName = containsFile || containsFolder;
     if (!containsName) {
       return {
-        ExitStatus: 1,
-        Output: [`"${name}" does not exist in current directory`],
+        exitStatus: 1,
+        output: [`"${name}" does not exist in current directory`],
       };
     }
     if (containsFile) {
@@ -361,16 +361,16 @@ class TerminalCommands {
     }
     Storage.saveFileSystem(this.fileSystem.root);
     return {
-      ExitStatus: 0,
-      Output: [],
+      exitStatus: 0,
+      output: [],
     };
   }
 
   private pwd(args: Array<string>): CommandResult {
     console.debug(`pwd called with ${args.length} args`);
     return {
-      ExitStatus: 0,
-      Output: [this.terminalState.currDir.getFullName()],
+      exitStatus: 0,
+      output: [this.terminalState.currDir.getFullName()],
     };
   }
 
@@ -378,8 +378,8 @@ class TerminalCommands {
     console.debug(`cat called with ${args.length} args`);
     if (args.length === 0) {
       return {
-        ExitStatus: 1,
-        Output: ['usage: cat [file]'],
+        exitStatus: 1,
+        output: ['usage: cat [file]'],
       };
     }
     const name = args[0];
@@ -387,13 +387,13 @@ class TerminalCommands {
     const file = dir.getFile(name);
     if (!file) {
       return {
-        ExitStatus: 1,
-        Output: [`file "${name}" does not exist in current directory`],
+        exitStatus: 1,
+        output: [`file "${name}" does not exist in current directory`],
       };
     }
     return {
-      ExitStatus: 0,
-      Output: file.text.split('\n'),
+      exitStatus: 0,
+      output: file.text.split('\n'),
     }
   }
 
@@ -401,8 +401,8 @@ class TerminalCommands {
     console.debug(`echo called with ${args.length} args`);
     const echoText = `${input}${args.join(' ')}`;
     return {
-      ExitStatus: 0,
-      Output: echoText.length > 0 ? echoText.split('\n') : [],
+      exitStatus: 0,
+      output: echoText.length > 0 ? echoText.split('\n') : [],
     }
   }
 }
