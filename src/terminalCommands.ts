@@ -160,11 +160,13 @@ class TerminalCommands {
         return;
       }
     }
-    const file = dir.getFile(filename);
-    if (file) {
-      file.text = input;
-      Storage.saveFileText(file);
+    let file = dir.getFile(filename);
+    if (!file) {
+      file = new File(filename, '');
+      dir.addFile(file);
     }
+    file.text = input;
+    Storage.saveFileText(file);
   }
 
   private appendToFile(input: string, filename: string) {
@@ -181,11 +183,13 @@ class TerminalCommands {
         return;
       }
     }
-    const file = dir.getFile(filename);
-    if (file) {
-      file.text = `${file.text}${input}`;
-      Storage.saveFileText(file);
+    let file = dir.getFile(filename);
+    if (!file) {
+      file = new File(filename, '');
+      dir.addFile(file);
     }
+    file.text = `${file.text}${input}`;
+    Storage.saveFileText(file);
   }
 
   // cycleCommand returns a command forwards or backwards in history
