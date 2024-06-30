@@ -214,17 +214,25 @@ class Terminal {
     navigator.clipboard.readText().then((pasteText) => this.readPasteTextComplete(pasteText));
   }
 
+  private deleteToWhitespace() {
+    const currLine = this.state.currTextLineCmd;
+    const currIndex = this.state.cursorIndex;
+    if (currIndex === 0) {
+      return;
+    }
+    const startIndex = currIndex;
+    const incrementor = -1;
+    let newIndex = this.findNextWord(currIndex, currLine, incrementor);
+    if (newIndex === -1) {
+      newIndex = 0;
+    }
+    this.state.setCurrTextLineCmd(
+      `${currLine.substring(0, newIndex)}${currLine.substring(startIndex)}`);
+    this.state.setCursorIndex(newIndex);
+    this.render();
+  }
+
   private onKeyDown(e: KeyboardEvent) {
-    if (e.ctrlKey && e.key === 'k') {
-      this.clearTerminal();
-      e.preventDefault();
-      return;
-    }
-    if (e.ctrlKey && e.key === 'u') {
-      this.clearCurrentLine();
-      e.preventDefault();
-      return;
-    }
     if (e.ctrlKey && e.key === 'ArrowLeft') {
       this.handleTraverseWord(true);
       e.preventDefault();
@@ -232,6 +240,21 @@ class Terminal {
     }
     if (e.ctrlKey && e.key === 'ArrowRight') {
       this.handleTraverseWord(false);
+      e.preventDefault();
+      return;
+    }
+    if (e.ctrlKey && e.key === 'd') {
+      this.deleteToWhitespace();
+      e.preventDefault();
+      return;
+    }
+    if (e.ctrlKey && e.key === 'k') {
+      this.clearTerminal();
+      e.preventDefault();
+      return;
+    }
+    if (e.ctrlKey && e.key === 'u') {
+      this.clearCurrentLine();
       e.preventDefault();
       return;
     }
